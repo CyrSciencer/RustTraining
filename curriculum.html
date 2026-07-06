@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust Advanced Modules - Module GE01: 2D SVG Game Engine Architecture</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #2c3e50;
+            --primary-color: #2980b9;
+            --secondary-color: #2c3e50;
+            --code-bg: #f8f9fa;
+            --border-color: #e2e8f0;
+            --accent-color: #e74c3c;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-top: 0;
+        }
+
+        .meta-box {
+            background-color: var(--code-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .meta-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-top: 30px;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            text-align: justify;
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            background-color: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            border: 1px solid var(--border-color);
+        }
+
+        pre {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            background-color: var(--code-bg);
+            padding: 18px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            line-height: 1.45;
+            margin-bottom: 1.5rem;
+        }
+
+        .exercise-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 40px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .exercise-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin: 0;
+        }
+
+        .turn-in-info {
+            background-color: #edf2f7;
+            padding: 12px 18px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .warning-box {
+            background-color: #fff5f5;
+            border-left: 4px solid var(--accent-color);
+            color: #c53030;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.95rem;
+        }
+
+        @media print {
+            body { font-size: 12pt; color: #000a; background-color: #fff; }
+            .container { max-width: 100%; padding: 0; }
+            .exercise-card { page-break-inside: avoid; border: 1px solid #000; box-shadow: none; }
+            pre { border: 1px solid #000; page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Rust Piscine &amp; Advanced Tracks</h1>
+        <div class="subtitle">Module GE01: 2D SVG Game Engine Architecture</div>
+    </header>
+
+    <div class="meta-box">
+        <strong>Module Placement &amp; Specifications:</strong>
+        <ul>
+            <li><strong>Prerequisites:</strong> Ex 0.5 (State Persistence &amp; JSON Systems) of your core Rust track.</li>
+            <li><strong>Primary Focus:</strong> Building a hardware-resilient desktop environment optimized specifically for loading, managing, and running data-driven 2D Scalable Vector Graphics (SVG) simulation pipelines.</li>
+            <li><strong>Compilation Matrix:</strong> Execution configurations must compile cleanly via <code>cargo build</code>. Any unhandled application-level panic is evaluated as a strict <strong>KO</strong>.</li>
+        </ul>
+    </div>
+
+    <h2>General Instructions</h2>
+    <p>
+        Abstractions within standard application engineering prioritize behavioral decoupling. High-performance game loop pipelines, however, balance design mechanics directly against target memory structures. In this module, you will transition away from standalone data structures and write a dedicated desktop engine environment. 
+    </p>
+    <p>
+        Your engine will manage desktop windows, pack alphanumeric 2D vector asset payloads, navigate memory matrices sequentially to step game simulations, and isolate gameplay loops into unified modular scene states.
+    </p>
+
+    <div class="warning-box">
+        <strong>Forbidden Frameworks:</strong> The integration of holistic game frameworks or heavy engine architectures (e.g., Bevy, Amethyst, Fyrox) is strictly prohibited. You must implement the structural synchronization, window event routing, and components natively.
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-header">
+            <div class="exercise-title">Exercise 06: The SVG Asset Manifest (Text-Based)</div>
+            <div>To do after: Ex 0.5</div>
+        </div>
+        
+        <div class="turn-in-info">
+            <strong>Turn-in directory:</strong> ex06/<br>
+            <strong>Files to turn in:</strong> Cargo.toml, src/lib.rs, src/main.rs<br>
+            <strong>Allowed external crates:</strong> serde, serde_derive, serde_json
+        </div>
+
+        <h3>Description</h3>
+        <p>
+            Unlike pixelated raster textures (PNG/JPG), 2D vector graphics engines treat visual entities as scalable structural paths described via text XML string formats (<code>.svg</code> files). Before attempting to bake assets into production packages, an engine needs to model what a vector asset looks like in system memory.
+        </p>
+        <p>
+            Building directly upon your serialization work from <strong>Exercise 0.5</strong>, you will create a text-based <strong>SVG Asset Manifest Manager</strong>. This layer reads actual text SVG data from your disk, stores it inside an structured enum along with its rendering canvas size parameters, and saves the registry out as a human-readable JSON manifest.
+        </p>
+
+        <h3>Requirements</h3>
+        <ol>
+            <li>Define a <code>VectorGraphics</code> data struct containing three fields: 
+                <ul>
+                    <li><code>raw_xml: String</code> (the raw text content of the target .svg file)</li>
+                    <li><code>width: f32</code> and <code>height: f32</code> (the intended rendering canvas logical size rules).</li>
+                </ul>
+            </li>
+            <li>Define an <code>Asset</code> data enum containing a dedicated <code>Vector(VectorGraphics)</code> variant. Derive <code>Serialize</code> and <code>Deserialize</code> on all structural asset layouts.</li>
+            <li>Create an <code>AssetManifest</code> struct containing a <code>std::collections::HashMap&lt;String, Asset&gt;</code> that maps unique string lookup names (GUIDs, like <code>"player_ship"</code>) to their target properties.</li>
+            <li>Implement the following concrete API interfaces on your <code>AssetManifest</code> context block:
+                <pre><code class="language-rust">impl AssetManifest {
+    pub fn new() -&gt; Self;
+    pub fn register_svg(&amp;mut self, guid: &amp;str, file_path: &amp;str, w: f32, h: f32) -&gt; std::io::Result&lt;()&gt;;
+    pub fn save_to_json(&amp;self, path: &amp;str) -&gt; std::io::Result&lt;()&gt;;
+    pub fn load_from_json(path: &amp;str) -&gt; std::io::Result&lt;Self&gt;;
+}</code></pre>
+            </li>
+            <li>The <code>register_svg</code> function must open the physical file path using standard filesystem utilities (<code>std::fs::read_to_string</code>), load its contents cleanly into memory, and insert it into the underlying asset tracking map.</li>
+        </ol>
+
+        <h3>Expected Main Example Validation</h3>
+        <pre><code class="language-rust">// Simple execution test block for ex06
+use ex06::AssetManifest;
+use std::fs::File;
+use std::io::Write;
+
+fn main() {
+    // Generate a temporary mock SVG file on disk to test parsing layers
+    let mock_svg_path = "mock_hero.svg";
+    let mut file = File::create(mock_svg_path).unwrap();
+    file.write_all(b"&lt;svg&gt;&lt;rect width='32' height='32' fill='green'/&gt;&lt;/svg&gt;").unwrap();
+
+    let mut manifest = AssetManifest::new();
+    manifest.register_svg("svg_player", mock_svg_path, 32.0, 32.0).expect("Failed to register asset file");
+
+    // Save out as a clean, human-readable text tracking configuration asset manifest
+    manifest.save_to_json("assets_manifest.json").expect("Failed to write manifest file");
+    
+    let loaded_manifest = AssetManifest::load_from_json("assets_manifest.json").unwrap();
+    println!("[ENGINE] Text-based SVG Manifest system verified successfully.");
+}</code></pre>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-header">
+            <div class="exercise-title">Exercise 07: High-Performance Binary Asset Packing</div>
+            <div>To do after: Ex 06</div>
+        </div>
+        
+        <div class="turn-in-info">
+            <strong>Turn-in directory:</strong> ex07/<br>
+            <strong>Files to turn in:</strong> Cargo.toml, src/lib.rs, src/main.rs<br>
+            <strong>Allowed external crates:</strong> serde, serde_derive, bincode (v1.3.x)
+        </div>
+
+        <h3>Description</h3>
+        <p>
+            While human-readable formats like JSON are fantastic during game development for rapid editing, parsing large text-based files frame-by-frame or loading thousands of separate string files during application startup adds massive overhead. Production-grade game engines bypass this by creating a <strong>Baking Asset Pipeline</strong>: raw developer assets are gathered up and compiled into a tight, optimized, custom single binary package file.
+        </p>
+        <p>
+            In this exercise, you will upgrade your asset management layer. You will write a tool that imports your text-based asset manifest from Exercise 06 and converts it directly into a highly efficient binary blob structure using the zero-overhead <code>bincode</code> format.
+        </p>
+
+        <h3>Requirements</h3>
+        <ol>
+            <li>Import or re-implement your derived data layout structs (<code>Asset</code>, <code>VectorGraphics</code>) from Exercise 06.</li>
+            <li>Create an <code>AssetRegistry</code> container block designed specifically for production binary deployments.</li>
+            <li>Implement the following explicit compilation and loading pipeline mechanics:
+                <pre><code class="language-rust">impl AssetRegistry {
+    pub fn new() -&gt; Self;
+    pub fn append_asset(&amp;mut self, guid: &amp;str, asset: Asset);
+    pub fn compile_to_binary_package(&amp;self, output_path: &amp;str) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt;;
+    pub fn load_from_binary_package(package_path: &amp;str) -&gt; Result&lt;Self, Box&lt;dyn std::error::Error&gt;&gt;;
+}</code></pre>
+            </li>
+            <li>The <code>compile_to_binary_package</code> function must use <code>bincode::serialize_into</code> to stream data straight into a flat file on your disk. The matching <code>load_from_binary_package</code> call must use <code>bincode::deserialize_from</code> to reconstruct memory structures instantly. This layout guarantees lightning-fast loading speeds for your desktop app.</li>
+        </ol>
+    </div>
+
+    <div class="exercise-card">
+    <div class="exercise-header">
+        <div class="exercise-title">Exercise 08: Decoupled Simulation &amp; Fixed Timestep Loops</div>
+        <div>To do after: Ex 07</div>
+    </div>
+    
+    <div class="turn-in-info">
+        <strong>Turn-in directory:</strong> ex08/<br>
+        <strong>Files to turn in:</strong> Cargo.toml, src/main.rs<br>
+        <strong>Allowed external crates:</strong> None (Standard library only)
+    </div>
+
+    <h3>Description</h3>
+    <p>
+        To prevent physics-simulation divergence during variable-speed frame rendering, this module introduces the <strong>Fixed Timestep Accumulator</strong> model. By decoupling the simulation rate from the rendering rate, we ensure deterministic behavior regardless of hardware performance.
+    </p>
+
+    <h3>Sub-Exercise 8.1: The Precision Timer</h3>
+    <p>Implement a loop using <code>std::time::Instant</code> to measure the delta time (Δt) between iterations. Print the current elapsed Δt in milliseconds. Verify your system is reporting time intervals consistently before moving to logic integration.</p>
+
+    <h3>Sub-Exercise 8.2: The Accumulator Reservoir</h3>
+    <p>Define an <code>accumulator: f32</code> variable. Add the measured Δt from 8.1 into this reservoir every loop. Trigger a "Physics Tick" log only when the accumulator reaches or exceeds <strong>20ms</strong>, then subtract exactly 20ms from the accumulator.</p>
+
+    <h3>Sub-Exercise 8.3: The Deterministic Physics Step</h3>
+    <p>Abstract your physics logic into a function <code>fn update_physics(dt: f32)</code>. Update your <code>while</code> loop to execute this function exactly once for every 20ms slice consumed from the accumulator. This ensures the simulation progresses in discrete, predictable units of time.</p>
+
+    <h3>Sub-Exercise 8.4: The Lag-Stress Test</h3>
+    <p>Simulate processing spikes: introduce a counter that uses <code>std::thread::sleep</code> to alternate stall lengths between 10ms and 55ms. Verify that during the 55ms stall, the engine correctly processes multiple physics ticks (3 ticks: 60ms consumed) in a single loop cycle to "catch up" the simulation state.</p>
+
+    <div style="text-align: center; margin: 20px 0;">
+        
+    </div>
+
+    <h3>Requirements</h3>
+    <ol>
+        <li>Target fixed timestep constant (Δt<sub>fixed</sub>): <strong>20ms</strong> (50 ticks/sec).</li>
+        <li>Print <code>[PHYSICS] Stepping 2D Physics Matrix: 20ms</code> per tick.</li>
+        <li>Print <code>[RENDER] Rasterizing active SVG shapes to screen</code> per loop iteration.</li>
+        <li>Terminate program cleanly after exactly 10 render loops.</li>
+    </ol>
+</div>
+
+    <div class="exercise-card">
+        <div class="exercise-header">
+            <div class="exercise-title">Exercise 09: Cache-Aligned 2D Vector ECS Architecture</div>
+            <div>To do after: Ex 08</div>
+        </div>
+        
+        <div class="turn-in-info">
+            <strong>Turn-in directory:</strong> ex09/<br>
+            <strong>Files to turn in:</strong> Cargo.toml, src/main.rs<br>
+            <strong>Allowed external crates:</strong> None (Standard library only)
+        </div>
+
+        <h3>Description</h3>
+        <p>
+            Object-oriented layouts bundle structural behaviors together (e.g., an actor class containing names, matrix objects, vector drawing XML text strings, and processing states). This design introduces massive runtime performance bottlenecks because it scatters components across unaligned memory blocks on the heap. When an engine runs loops to update object positions, it is forced to load irrelevant graphic strings into the CPU cache line, wasting memory bandwidth.
+        </p>
+        <p>
+            An <strong>Entity Component System (ECS)</strong> optimizes this layout by splitting data properties into parallel, flat, contiguous arrays. This architecture ensures that spatial physics systems iterate sequentially through closely packed position numbers, maximizing CPU L1/L2 cache locality.
+        </p>
+
+        <h3>Requirements</h3>
+        <ol>
+            <li>Define a unique identifier type alias named <code>Entity</code> mapping directly to <code>usize</code>.</li>
+            <li>Define three pure data component structures:
+                <ul>
+                    <li><code>Transform2D</code>: Struct containing spatial coordinates: <code>x: f32, y: f32, scale: f32</code>.</li>
+                    <li><code>Motion2D</code>: Struct containing movement vectors: <code>vx: f32, vy: f32</code>.</li>
+                    <li><code>SvgRender</code>: Struct containing a reference identifier keying back to the vector graphics asset bundle: <code>asset_guid: String</code>.</li>
+                </ul>
+            </li>
+            <li>Construct a <code>World</code> simulation struct designed to keep component segments packed closely together in flat, contiguous vectors aligned by index lookup:
+                <pre><code class="language-rust">pub struct World {
+    transforms: Vec&lt;Option&lt;Transform2D&gt;&gt;,
+    motions: Vec&lt;Option&lt;Motion2D&gt;&gt;,
+    renders: Vec&lt;Option&lt;SvgRender&gt;&gt;,
+    next_id: usize,
+}</code></pre>
+            </li>
+            <li>Implement the following methods on your central <code>World</code> structure:
+                <ul>
+                    <li><code>pub fn new() -&gt; Self;</code></li>
+                    <li><code>pub fn spawn_actor(&amp;mut self) -&gt; Entity;</code></li>
+                    <li><code>pub fn attach_transform(&amp;mut self, entity: Entity, t: Transform2D);</code></li>
+                    <li><code>pub fn attach_motion(&amp;mut self, entity: Entity, m: Motion2D);</code></li>
+                    <li><code>pub fn attach_render(&amp;mut self, entity: Entity, r: SvgRender);</code></li>
+                </ul>
+            </li>
+            <li>Implement an isolated system pipeline function: <code>pub fn step_kinematics(world: &amp;mut World)</code>. This function must iterate linearly through the components. For every entity slot index that holds active data for <strong>both</strong> <code>Transform2D</code> and <code>Motion2D</code>, update its positions:
+                <div style="text-align: center; margin: 10px 0; font-family: monospace;">
+                    transform.x += motion.vx;<br>
+                    transform.y += motion.vy;
+                </div>
+            </li>
+        </ol>
+
+        <h3>Expected Main Example Validation</h3>
+        <pre><code class="language-rust">use ex09::{World, Transform2D, Motion2D, SvgRender};
+
+fn main() {
+    let mut world = World::new();
+
+    // Actor 0: Static SVG Map Boundary (Only has Position &amp; Graphic references)
+    let background = world.spawn_actor();
+    world.attach_transform(background, Transform2D { x: 0.0, y: 0.0, scale: 1.0 });
+    world.attach_render(background, SvgRender { asset_guid: String::from("svg_map_grid") });
+
+    // Actor 1: Dynamic Vector Agent (Possesses complete Kinematic components)
+    let player = world.spawn_actor();
+    world.attach_transform(player, Transform2D { x: 12.0, y: -5.0, scale: 2.5 });
+    world.attach_motion(player, Motion2D { vx: 0.5, vy: 1.2 });
+    world.attach_render(player, SvgRender { asset_guid: String::from("svg_player_vessel") });
+
+    println!("[ECS] Memory alignment mapped. Run sequence steps...");
+    for frame in 1..=3 {
+        ex09::step_kinematics(&amp;mut world);
+        println!("[ECS] Matrix loop step {} finished.", frame);
+    }
+}</code></pre>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-header">
+            <div class="exercise-title">Exercise 10: The Engine Virtual File System (VFS)</div>
+            <div>To do after: Ex 09</div>
+        </div>
+        
+        <div class="turn-in-info">
+            <strong>Turn-in directory:</strong> ex10/<br>
+            <strong>Files to turn in:</strong> Cargo.toml, src/lib.rs, src/main.rs<br>
+            <strong>Allowed external crates:</strong> None (Standard library only)
+        </div>
+
+        <h3>Description</h3>
+        <p>
+            Hardcoding platform-specific absolute file paths (e.g., <code>C:\Users\Game\assets\player.svg</code> or <code>/home/user/game/assets/player.svg</code>) directly into system load calls limits cross-platform deployment. To ensure smooth execution across all targets, game engines decouple physical paths using a logical <strong>Virtual File System (VFS)</strong> protocol.
+        </p>
+        <p>
+            A VFS registers a unified high-level path syntax namespace (e.g., <code>"game://sprites/hero.svg"</code>) and translates it dynamically into valid platform-relative directory paths at runtime depending on where the application execution target is rooted.
+        </p>
+
+        <h3>Requirements</h3>
+        <ol>
+            <li>Create an <code>EngineVFS</code> struct that tracks the base folder workspace root path using a <code>std::path::PathBuf</code> container.</li>
+            <li>Implement the initialization constructor: <code>pub fn new(base_path: &amp;str) -&gt; Self;</code>.</li>
+            <li>Implement the routing resolution methodology: <code>pub fn resolve_vfs_uri(&amp;self, uri: &amp;str) -&gt; Result&lt;std::path::PathBuf, &amp;'static str&gt;;</code>.</li>
+            <li>Your path translation function must parse asset URI formatting protocols:
+                <ul>
+                    <li><code>"game://assets/ui.svg"</code> translates relative to: <code>[base_path]/game/assets/ui.svg</code>.</li>
+                    <li><code>"engine://core/fallback.svg"</code> translates relative to: <code>[base_path]/engine/core/fallback.svg</code>.</li>
+                </ul>
+            </li>
+            <li><strong>Security Boundary:</strong> If a path string contains directory traversal escape markers (e.g., testing for <code>"../"</code> sequences intended to break out of the engine workspace root directory), your allocator must intercept it immediately and return an <code>Err("VFS Traversal Security Infraction")</code>. Failure to prevent traversal manipulation is a strict **KO**.</li>
+        </ol>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-header">
+            <div class="exercise-title">Exercise 11: Polymorphic Scene State Node Management</div>
+            <div>To do after: Ex 10</div>
+        </div>
+        
+        <div class="turn-in-info">
+            <strong>Turn-in directory:</strong> ex11/<br>
+            <strong>Files to turn in:</strong> Cargo.toml, src/main.rs<br>
+            <strong>Allowed external crates:</strong> None (Standard library only)
+        </div>
+
+        <h3>Description</h3>
+        <p>
+            A production-ready game engine must organize separate states of execution cleanly (e.g., clearing background menus when loading levels, or caching background worlds when overlaying inventory screens). Loading every single asset registry, tracking hash, and physics simulation entity array into a single monolithic loop is impossible to maintain.
+        </p>
+        <p>
+            In this exercise, you will implement a modular, type-safe <strong>Polymorphic Scene Stack Manager</strong> that isolates runtime execution loops into clean, decoupled context layers using Rust trait objects.
+        </p>
+
+        <h3>Requirements</h3>
+        <ol>
+            <li>Define a <code>Scene</code> trait containing three operational lifecycle state hooks:
+                <pre><code class="language-rust">pub trait Scene {
+    fn on_scene_enter(&amp;mut self);
+    fn on_scene_tick(&amp;mut self) -&gt; Option&lt;SceneTransition&gt solos;
+    fn on_scene_exit(&amp;mut self);
+}</code></pre>
+            </li>
+            <li>Define an adjustment routing enum named <code>SceneTransition</code> containing two distinct stack mutations:
+                <ul>
+                    <li><code>Push(Box&lt;dyn Scene&gt;)</code>: Suspends execution of the current scene and stacks a new context over it.</li>
+                    <li><code>Pop</code>: Unloads and discards the active top scene context, returning execution back to the underlying layer.</li>
+                </ul>
+            </li>
+            <li>Create a <code>SceneStackController</code> struct that tracks active execution contexts sequentially using a vector array stack layout: <code>active_layers: Vec&lt;Box&lt;dyn Scene&gt;&gt;</code>.</li>
+            <li>Implement the following methods on your controller structure:
+                <ul>
+                    <li><code>pub fn push_context(&amp;mut self, mut scene: Box&lt;dyn Scene&gt;)</code>: Automatically executes the <code>on_scene_enter()</code> method of the incoming scene before storing it onto the stack array.</li>
+                    <li><code>pub fn process_tick(&amp;mut self) -&gt; bool</code>: Runs the <code>on_scene_tick()</code> callback of the top scene context. If a transition is returned, execute the state mutation and run the appropriate cleanup hook (<code>on_scene_exit()</code>). Returns <code>false</code> if the stack becomes completely empty, signaling the engine to close.</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-header">
+            <div class="exercise-title">Exercise 12: Desktop Windowing &amp; Integrated Engine Frame Runtime</div>
+            <div>To do after: Ex 11</div>
+        </div>
+        
+        <div class="turn-in-info">
+            <strong>Turn-in directory:</strong> ex12/<br>
+            <strong>Files to turn in:</strong> Cargo.toml, src/main.rs<br>
+            <strong>Allowed external crates:</strong> winit (v0.29.x or v0.30.x)
+        </div>
+
+        <h3>Description</h3>
+        <p>
+            To complete your desktop engine core, you must interface directly with the operating system's window manager server. Modern desktop environments run on an <strong>Event-Driven Message Inversion Loop</strong>. The operating system handles hardware interactions (resizing, canvas draw triggers, close signals) and routes them into an application message queue.
+        </p>
+        <p>
+            In this final integration exercise, you will marry all systems together. You will build an active window loop via <code>winit</code> and embed your **Fixed Timestep Accumulator (Ex 08)** and your **Polymorphic Scene Controller (Ex 11)** completely inside the OS lifecycle handler layout.
+        </p>
+
+        <h3>Requirements</h3>
+        <ol>
+            <li>Add the low-level window abstraction utility to your dependencies:
+                <pre><code class="language-toml">[dependencies]
+winit = "0.29"</code></pre>
+        </li>
+            <li>Create an engine container named <code>VectorEngineRuntime</code> that holds:
+                <ul>
+                    <li><code>window_surface: Option&lt;winit::window::Window&gt;</code></li>
+                    <li><code>scene_controller: SceneStackController</code> (From Ex 11)</li>
+                    <li><code>last_frame_time: std::time::Instant</code></li>
+                    <li><code>accumulator: f32</code> (The tracking timeline reservoir from Ex 08, tracked in seconds or milliseconds)</li>
+                </ul>
+            </li>
+            <li>Implement the <code>winit::application::ApplicationHandler</code> trait on your <code>VectorEngineRuntime</code> container. You must integrate your subsystems across these three hooks:
+                <ul>
+                    <li><code>resumed</code>: Instantiate your window here using <code>Window::default_attributes().with_title("2D SVG Vector Engine")</code>.</li>
+                    <li><code>window_event</code>: Handle <code>WindowEvent::CloseRequested</code> to shut down cleanly via <code>event_loop.exit()</code>.</li>
+                    <li><code>about_to_wait</code>: <strong>The Engine Loop Heartbeat.</strong> Calculate the delta time since `last_frame_time`. Add it to your `accumulator`. While `accumulator` is greater than or equal to your fixed timestep (20ms), execute <code>scene_controller.process_tick()</code>. If the scene controller signals the stack is empty, invoke <code>event_loop.exit()</code>. Finally, request a frame draw pass via <code>window.request_redraw()</code>.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>Expected Engine Entry Execution Architecture</h3>
+        <pre><code class="language-rust">use winit::application::ApplicationHandler;
+use winit::event::WindowEvent;
+use winit::event_loop::{ActiveEventLoop, EventLoop, ControlFlow};
+use winit::window::{Window, WindowId};
+use std::time::{Instant, Duration};
+
+// Mock structures placeholder matching your Ex 11 implementation requirements
+pub struct SceneStackController {}
+impl SceneStackController {
+    pub fn process_tick(&amp;mut self) -> bool {
+        println!("[PHYSICS SYSTEM] Stepping 2D Matrix via Active Scene: 20ms");
+        true // Returns false if engine should terminate
+    }
+}
+
+struct VectorEngineRuntime {
+    window_surface: Option&lt;Window&gt;,
+    scene_controller: SceneStackController,
+    last_frame_time: Instant,
+    accumulator: f32,
+}
+
+impl ApplicationHandler for VectorEngineRuntime {
+    fn resumed(&amp;mut self, event_loop: &amp;ActiveEventLoop) {
+        if self.window_surface.is_none() {
+            let attribs = Window::default_attributes()
+                .with_title("2D SVG Vector Forge Engine")
+                .with_inner_size(winit::dpi::LogicalSize::new(1024.0, 768.0));
+            
+            let win = event_loop.create_window(attribs).unwrap();
+            println!("[ENGINE] Host OS Desktop Canvas allocated successfully.");
+            self.window_surface = Some(win);
+            self.last_frame_time = Instant::now();
+        }
+    }
+
+    fn window_event(&amp;mut self, event_loop: &amp;ActiveEventLoop, _id: WindowId, event: WindowEvent) {
+        match event {
+            WindowEvent::CloseRequested =&gt; {
+                println!("[TEARDOWN] Tearing down engine runtime vectors...");
+                event_loop.exit();
+            }
+            WindowEvent::RedrawRequested =&gt; {
+                if let Some(_window) = &amp;self.window_surface {
+                    println!("[RENDER PATH] Rasterizing active SVG shapes to screen");
+                }
+            }
+            _ =&gt; ()
+        }
+    }
+
+    fn about_to_wait(&amp;mut self, event_loop: &amp;ActiveEventLoop) {
+        if let Some(window) = &amp;self.window_surface {
+            let current_time = Instant::now();
+            let delta_time = current_time.duration_since(self.last_frame_time).as_secs_f32();
+            self.last_frame_time = current_time;
+
+            // Step 1: Accumulate execution time pools (Ex 08 pattern)
+            self.accumulator += delta_time;
+
+            // Step 2: Flush ticks at fixed structural durations (20ms)
+            const FIXED_TIMESTEP: f32 = 0.020; // 20 milliseconds
+            while self.accumulator &gt;= FIXED_TIMESTEP {
+                if !self.scene_controller.process_tick() {
+                    event_loop.exit();
+                    return;
+                }
+                self.accumulator -= FIXED_TIMESTEP;
+            }
+
+            // Step 3: Trigger a variable rendering refresh frame pass
+            window.request_redraw();
+        }
+    }
+}
+
+fn main() {
+    println!("[BOOT] Bootstrapping structural engine runtime systems...");
+    let loop_event = EventLoop::new().unwrap();
+    loop_event.set_control_flow(ControlFlow::Poll);
+
+    let mut runtime = VectorEngineRuntime { 
+        window_surface: None,
+        scene_controller: SceneStackController {},
+        last_frame_time: Instant::now(),
+        accumulator: 0.0,
+    };
+    loop_event.run_app(&amp;mut runtime).unwrap();
+}</code></pre>
+    </div>
+</div>
+
+</body>
+</html>
