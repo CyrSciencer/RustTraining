@@ -3,155 +3,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal Cross-Platform Windowing in Rust</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-900 text-gray-100 font-sans leading-relaxed">
+    <title>Rust Advanced Tracks - Module GE02-B: Beginner Desktop Foundations</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #2c3e50;
+            --primary-color: #1abc9c;
+            --secondary-color: #2c3e50;
+            --code-bg: #f8f9fa;
+            --border-color: #e2e8f0;
+            --accent-color: #e67e22;
+        }
 
-    <!-- Header -->
-    <header class="border-b border-gray-800 bg-gray-950 py-12">
-        <div class="max-w-4xl mx-auto px-6">
-            <span class="text-indigo-400 font-mono text-sm uppercase tracking-wider">Systems Programming Course</span>
-            <h1 class="text-4xl font-extrabold text-white mt-2 mb-4">Universal Cross-Platform Windowing in Rust</h1>
-            <p class="text-gray-400 text-lg">Mastering OS-agnostic GUI architecture, event loop lifecycles, and windowing traps without platform-specific code.</p>
-        </div>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-top: 0;
+        }
+
+        .meta-box {
+            background-color: var(--code-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .meta-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-top: 30px;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            text-align: justify;
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            background-color: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            border: 1px solid var(--border-color);
+        }
+
+        pre {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            background-color: var(--code-bg);
+            padding: 18px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            line-height: 1.45;
+            margin-bottom: 1.5rem;
+        }
+
+        .exercise-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 40px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .exercise-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin: 0;
+        }
+
+        .turn-in-info {
+            background-color: #edf2f7;
+            padding: 12px 18px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .warning-box {
+            background-color: #fff9db;
+            border-left: 4px solid var(--accent-color);
+            color: #b05c04;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.95rem;
+        }
+
+        .substeps {
+            background-color: #fcfcfc;
+            border-left: 3px solid #cbd5e0;
+            padding-left: 15px;
+            margin: 20px 0;
+        }
+
+        .substeps li {
+            margin-bottom: 10px;
+        }
+
+        @media print {
+            body { font-size: 12pt; color: #000a; background-color: #fff; }
+            .container { max-width: 100%; padding: 0; }
+            .exercise-card { page-break-inside: avoid; border: 1px solid #000; box-shadow: none; }
+            pre { border: 1px solid #000; page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Rust Piscine &amp; Advanced Tracks</h1>
+        <div class="subtitle">Module GE02-B: Beginner Desktop Foundations &amp; Pixel Playgrounds</div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-4xl mx-auto px-6 py-12">
+    <div class="meta-box">
+        <strong>Curriculum Readjustment Note:</strong>
+        <p>
+            Welcome! If you have never built a desktop application, the leap from terminal utilities to windowing contexts can feel incredibly steep. This module has been rewritten from scratch. We have broken the process down into five tiny, bite-sized, logical stepping stones. 
+        </p>
+        <p>
+            You will go from a simple blank window to a fully interactive, scaling desktop application without any massive jumps in difficulty.
+        </p>
+    </div>
 
-        <!-- Introduction -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Introduction</h2>
-            <p class="text-gray-300 mb-4">
-                Developing desktop software in Rust requires bridging the gap between Rust’s strict memory model and the wildly different windowing backends of target operating systems:
-            </p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
-                <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                    <span class="text-blue-400 font-bold block mb-1">Windows (Win32)</span>
-                    <span class="text-sm text-gray-400">Highly stateful, thread-affine APIs utilizing Windows Messages.</span>
-                </div>
-                <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                    <span class="text-purple-400 font-bold block mb-1">macOS (Cocoa)</span>
-                    <span class="text-sm text-gray-400">Strictly main-thread bound runtime backed by Objective-C messaging.</span>
-                </div>
-                <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                    <span class="text-pink-400 font-bold block mb-1">Linux (Wayland/X11)</span>
-                    <span class="text-sm text-gray-400">Asynchronous, socket-based protocols demanding explicit frame presentation.</span>
-                </div>
-            </div>
-        </section>
+    <h2>Theoretical Foundation: The Event Loop &amp; Framebuffers</h2>
+    <p>
+        Unlike terminal tools that execute lines of code and exit, desktop applications use an <strong>Inversion of Control (IoC)</strong> layout. The Operating System (OS) runs an active <strong>Event Loop</strong>. Your code registers itself as a listener, sitting patiently inside this loop waiting for OS notifications like window resizes, keystrokes, or display requests.
+    </p>
+    <p>
+        To render images, we manage a <strong>Framebuffer</strong>: a giant, flat, one-dimensional array containing your pixel colors. To position a point on a standard two-dimensional grid, we calculate its index inside this linear array using:
+    </p>
+    <div style="text-align: center; margin: 15px 0;">
+        $$I = (Y \times W) + X$$
+    </div>
+    <p>
+        Where $I$ is the index in your array, $W$ is the width of your window in pixels, and $X$ and $Y$ are your coordinate offsets.
+    </p>
 
-        <!-- Module 1 -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Module 1: The Anatomy of a Universal Event Loop</h2>
-            <p class="text-gray-300 mb-4">
-                In modern Rust (using window managers like <code class="bg-gray-850 px-1.5 py-0.5 rounded text-indigo-300 font-mono text-sm">winit</code>), you cannot write a sequential, top-down sequential sequence in your <code class="bg-gray-850 px-1.5 py-0.5 rounded text-indigo-300 font-mono text-sm">main</code> function to spin up a window. To run safely across all hardware platforms, your application must surrender control to an event-driven lifecycle handler.
-            </p>
-            <div class="bg-indigo-950/30 border-l-4 border-indigo-500 p-4 my-4 rounded-r">
-                <strong class="text-indigo-300 block mb-1">The macOS Main-Thread Constraint:</strong>
-                <p class="text-sm text-gray-300">Apple's Cocoa API requires that window initialization and event processing run exclusively on the very first thread spawned by the operating system (the Main Thread). Initiating windows inside a secondary thread or standard static scope will trigger an instant kernel panic.</p>
-            </div>
-            <h3 class="text-lg font-bold text-white mt-6 mb-2">Key Universal Lifecycle Rules:</h3>
-            <ul class="list-disc list-inside space-y-2 text-gray-300 ml-4">
-                <li><strong class="text-white">Never create a Window inside main:</strong> Only initialize your window surface inside the <code class="font-mono text-sm text-indigo-300">resumed()</code> event handler of your state controller.</li>
-                <li><strong class="text-white">Respect Control Flow:</strong> Utilize <code class="font-mono text-sm text-indigo-300">ControlFlow::Poll</code> for real-time applications like game engines, and <code class="font-mono text-sm text-indigo-300">ControlFlow::Wait</code> for standard UI apps to conserve CPU and battery power.</li>
-            </ul>
-        </section>
+    <!-- EXERCISE 01 -->
+    <div class="exercise-card">
+        <div class="exercise-header">
+            <div class="exercise-title">Exercise 01: The Hello World Window</div>
+            <div>Step 1: Loop Control</div>
+        </div>
+        
+        <div class="turn-in-info">
+            <strong>Turn-in directory:</strong> <code>ex01/</code><br>
+            <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
+            <strong>Allowed external crates:</strong> <code>winit</code> (v0.29.x or v0.30.x)
+        </div>
 
-        <!-- Module 2 -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Module 2: Cross-Platform Rendering Backends</h2>
-            <p class="text-gray-300 mb-4">
-                Creating an OS window is only half the battle; writing pixels onto the window surface safely without writing raw DirectX, Metal, or Vulkan APIs is where a targeted rendering backend comes in.
-            </p>
-            <div class="overflow-x-auto my-6">
-                <table class="w-full text-left border-collapse text-sm text-gray-300">
-                    <thead>
-                        <tr class="border-b border-gray-700 bg-gray-800/50">
-                            <th class="p-3 font-bold text-white">Rendering Strategy</th>
-                            <th class="p-3 font-bold text-white">Common Rust Tool</th>
-                            <th class="p-3 font-bold text-white">Primary Use Case</th>
-                            <th class="p-3 font-bold text-white">Portability</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-b border-gray-800">
-                            <td class="p-3 font-mono text-indigo-300">Software Framebuffer</td>
-                            <td class="p-3">softbuffer</td>
-                            <td class="p-3">2D rendering, retro engines, simple UI</td>
-                            <td class="p-3 text-emerald-400">100% (No GPU Required)</td>
-                        </tr>
-                        <tr class="border-b border-gray-800">
-                            <td class="p-3 font-mono text-indigo-300">Immediate Mode GPU</td>
-                            <td class="p-3">egui / wgpu</td>
-                            <td class="p-3">Debug panels, developer tools, dashboards</td>
-                            <td class="p-3 text-yellow-400">High (Requires GPU Drivers)</td>
-                        </tr>
-                        <tr class="border-b border-gray-800">
-                            <td class="p-3 font-mono text-indigo-300">Declarative Graphics</td>
-                            <td class="p-3">iced / gpui</td>
-                            <td class="p-3">Complex modern desktop applications</td>
-                            <td class="p-3 text-yellow-400">High (Requires layout engine)</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="bg-amber-950/30 border-l-4 border-amber-500 p-4 my-4 rounded-r">
-                <strong class="text-amber-300 block mb-1">The "No Content" Wayland Trap:</strong>
-                <p class="text-sm text-gray-300">Wayland handles OS rendering through a strict "no content, no window" protocol. Unlike Windows, which paints a default blank window, Wayland will refuse to show your application window at all until your software submits a populated frame buffer to the OS Compositor.</p>
-            </div>
-        </section>
+        <h3>Goal</h3>
+        <p>
+            Open an empty desktop window named "My First Window" and exit cleanly when clicking the standard window close ("X") button.
+        </p>
 
-        <!-- Module 3 -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Module 3: Native Desktop Traps & Quirks</h2>
-            <p class="text-gray-300 mb-4">
-                To achieve seamless, professional behavior across standard user environments, you must handle these structural platform constraints:
-            </p>
-            <div class="space-y-6">
-                <div>
-                    <h3 class="text-lg font-bold text-indigo-400 mb-1">1. High-DPI Display Scaling (Retina / 4K)</h3>
-                    <p class="text-gray-300 text-sm">
-                        Fixed pixel dimension settings can cause windows to render tiny on 4K monitors or blurry on Retina screens. Always monitor and adjust your layouts using the <code class="font-mono text-sm text-indigo-300">WindowEvent::ScaleFactorChanged</code> hook to scale logical coordinates to physical pixels.
-                    </p>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-indigo-400 mb-1">2. Eliminating the Windows Console Shadow</h3>
-                    <p class="text-gray-300 text-sm">
-                        Windows defaults to spawning a companion console background terminal next to compiled window binaries. Hide this behavior in release modes without stripping stdout on other platforms by setting your entrypoint module attributes properly:
-                    </p>
-                    <pre class="bg-gray-950 p-3 rounded text-sm font-mono text-emerald-400 border border-gray-800 mt-2">
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]</pre>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-indigo-400 mb-1">3. Render Coalescing</h3>
-                    <p class="text-gray-300 text-sm">
-                        Do not push draw executions immediately inside generic mouse or key input event scopes. This can overload window managers, causing stuttering. Instead, flag states as dirty and allow the OS to coordinate the timing via <code class="font-mono text-sm text-indigo-300">window.request_redraw()</code>.
-                    </p>
-                </div>
-            </div>
-        </section>
+        <h3>Step-by-Step Instructions</h3>
+        <ul class="substeps">
+            <li><strong>Step 1.1:</strong> Initialize a binary cargo crate: <code>cargo init ex01</code>.</li>
+            <li><strong>Step 1.2:</strong> Set your dependency crate: add <code>winit = "0.29"</code> to your <code>Cargo.toml</code>.</li>
+            <li><strong>Step 1.3:</strong> Create a state struct (e.g., <code>AppShell</code>) designed to hold your window instance. Because the window cannot exist until the event loop is running, store it inside an <code>Option</code> wrapper.</li>
+            <li><strong>Step 1.4:</strong> Implement <code>winit::application::ApplicationHandler</code> for your struct. In <code>resumed</code>, check if your window is empty. If so, build it using <code>event_loop.create_window</code>.</li>
+            <li><strong>Step 1.5:</strong> In <code>window_event</code>, look for <code>WindowEvent::CloseRequested</code>. When detected, use <code>event_loop.exit()</code> to shut down.</li>
+        </ul>
 
-        <!-- Module 4 -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Module 4: Your Turn to Build</h2>
-            <p class="text-gray-300 mb-4">
-                Use the architectural steps below to build your first completely resilient, cross-platform window:
-            </p>
-            <ol class="list-decimal list-inside space-y-3 text-gray-300 ml-4">
-                <li><strong class="text-white">Setup:</strong> Import <code class="font-mono text-indigo-300 text-sm">winit</code> and implement the <code class="font-mono text-indigo-300 text-sm">ApplicationHandler</code>.</li>
-                <li><strong class="text-white">Sanitize Instantiation:</strong> Set up your window configuration inside the <code class="font-mono text-indigo-300 text-sm">resumed()</code> callback.</li>
-                <li><strong class="text-white">Manage Shutdown:</strong> Listen explicitly for <code class="font-mono text-indigo-300 text-sm">WindowEvent::CloseRequested</code> and exit the running event loop gracefully.</li>
-                <li><strong class="text-white">Color Flush:</strong> Use a simple software framebuffer context to flush a clean, solid background color on start. This ensures compliance with macOS, Windows, and Wayland compositions simultaneously.</li>
-            </ol>
-        </section>
-    </main>
+        <h3>Syntactic Architecture &amp; Signatures</h3>
+        <pre><code class="language-rust">// State definition
+struct AppShell {
+    window: Option&lt;winit::window::Window&gt;,
+}
 
-    <!-- Footer -->
-    <footer class="border-t border-gray-800 py-8 text-center bg-gray-950 text-gray-500 text-sm">
-        <p>&copy; 2026 Systems Engineering Course. Built for high-performance Rust workflows.</p>
-    </footer>
+// Minimum event loop callbacks you must implement:
+// fn resumed(&amp;mut self, event_loop: &amp;winit::event_loop::ActiveEventLoop) -&gt; ()
+// fn window_event(&amp;mut self, event_loop: &amp;winit::event_loop::ActiveEventLoop, id: winit::window::WindowId, event: winit::event::WindowEvent) -&gt; ()
+</code></pre>
+    </div>
+
+    <!-- EXERCISE 02 -->
+    <div class="exercise-card">
+        <div class="exercise-header">
+            <div class="exercise-title">Exercise 02: Painting the canvas</div>
+            <div>Step 2: Presenting Colors</div>
+        </div>
+        
+        <div class="turn-in-info">
+            <strong>Turn-in directory:</strong> <code>ex02/</code><br>
+            <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code> (v0.4.x)
+        </div>
+
+        <h3>Goal</h3>
+        <p>
+            Take your window from Exercise 01 and paint its entire surface with a single solid background color: <strong>Deep Salmon Pink</strong> (Hex: <code>0x00FF8C94</code>).
+        </p>
+
+        <h3>Step-by-Step Instructions</h3>
+        <ul class="substeps">
+            <li><strong>Step 2.1:</strong> Include <code>softbuffer = "0.4"</code> in your <code>Cargo.toml</code>.</li>
+            <li><strong>Step 2.2:</strong> Because `softbuffer` holds references to your window, you must prevent ownership issues. Instead of a direct <code>Window</code> value, wrap your window in a Reference Counter: <code>Option&lt;Rc&lt;Window&gt;&gt;</code>.</li>
+            <li><strong>Step 2.3:</strong> Declare your <code>softbuffer::Context</code> and <code>softbuffer::Surface</code> objects inside your state structure.</li>
+            <li><strong>Step 2.4:</strong> Inside your event loop, capture <code>WindowEvent::RedrawRequested</code> events. When triggered, obtain your surface's frame buffer, scale its size dynamically to match the current window bounds, clear it with the hex color, and call <code>present()</code>.</li>
+        </ul>
+
+        <h3>Syntactic Architecture &amp; Signatures</h3>
+        <pre><code class="language-rust">use std::rc::Rc;
+
+struct PaletteApp {
+    window: Option&lt;Rc&lt;winit::window::Window&gt;&gt;,
+    context: Option&lt;softbuffer::Context&lt;Rc&lt;winit::window::Window&gt;&gt;&gt;,
+    surface: Option&lt;softbuffer::Surface&lt;Rc&lt;winit::window::Window&gt;, Rc&lt;winit::window::Window&gt;&gt;&gt;,
+}
+
+// Signature hint for painting loop:
+// fn repaint_screen(&amp;mut self) -&gt; Result&lt;(), softbuffer::SoftBufferError&gt;
+</code></pre>
+    </div>
+
+    <!-- EXERCISE 03 -->
+    <div class="exercise-card">
+        <div class="exercise-header">
+            <div class="exercise-title">Exercise 03: Drawing a Simple Square</div>
+            <div>Step 3: 1D to 2D Math Coordinate Mapping</div>
+        </div>
+        
+        <div class="turn-in-info">
+            <strong>Turn-in directory:</strong> <code>ex03/</code><br>
+            <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>
+        </div>
+
+        <h3>Goal</h3>
+        <p>
+            Instead of coloring the whole window, keep the background black (<code>0x00000000</code>) and paint a single, solid **Gold Square** (size $100 \times 100$ pixels, Hex: <code>0x00FFD700</code>) in the top-left quadrant of your window at coordinates $X=50$, $Y=50$.
+        </p>
+
+        <h3>Step-by-Step Instructions</h3>
+        <ul class="substeps">
+            <li><strong>Step 3.1:</strong> Carry over your frame presentation setup from Exercise 02.</li>
+            <li><strong>Step 3.2:</strong> Write a safe helper function that draws a rectangle. It should take your raw mutable 1D buffer slice, the actual width of the window, and draw to the calculated offsets.</li>
+            <li><strong>Step 3.3:</strong> Protect your loop from running out of bounds! Ensure you use nested <code>for</code> loops for $Y$ and $X$ ranges, making sure you don't write coordinates outside of your window width and height.</li>
+        </ul>
+
+        <h3>Syntactic Architecture &amp; Signatures</h3>
+        <pre><code class="language-rust">// Signature hint for rendering 2D rectangles in a flat 1D array:
+// fn draw_rect(buffer: &amp;mut [u32], fb_width: u32, fb_height: u32, x: u32, y: u32, rect_w: u32, rect_h: u32, color: u32) -&gt; ()
+</code></pre>
+    </div>
+
+    <!-- EXERCISE 04 -->
+    <div class="exercise-card">
+        <div class="exercise-header">
+            <div class="exercise-title">Exercise 04: Keyboard Controls &amp; Movement</div>
+            <div>Step 4: State Mutations &amp; Refreshes</div>
+        </div>
+        
+        <div class="turn-in-info">
+            <strong>Turn-in directory:</strong> <code>ex04/</code><br>
+            <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>
+        </div>
+
+        <h3>Goal</h3>
+        <p>
+            Make the gold square interactive! Maintain coordinates $X$ and $Y$ in your state. When the user presses the **Arrow Keys** (Up, Down, Left, Right), shift the square's position by $10$ pixels in that direction and redraw the window immediately.
+        </p>
+
+        <h3>Step-by-Step Instructions</h3>
+        <ul class="substeps">
+            <li><strong>Step 4.1:</strong> Add <code>square_x: u32</code> and <code>square_y: u32</code> to your state struct.</li>
+            <li><strong>Step 4.2:</strong> In <code>window_event</code>, intercept <code>WindowEvent::KeyboardInput</code> events.</li>
+            <li><strong>Step 4.3:</strong> Match the pressed key. If it is one of the four arrow keys, modify your coordinate values. Remember to keep coordinates bounded so the square doesn't slide completely off the canvas.</li>
+            <li><strong>Step 4.4:</strong> After modifying the state, call <code>self.window.as_ref().unwrap().request_redraw()</code> to let the event loop know it needs to draw the next frame.</li>
+        </ul>
+
+        <h3>Syntactic Architecture &amp; Signatures</h3>
+        <pre><code class="language-rust">struct InteractiveCanvas {
+    // Window buffers ...
+    square_x: u32,
+    square_y: u32,
+}
+
+// Signature hint to handle keystroke matching:
+// fn handle_key_input(&amp;mut self, key_event: &amp;winit::event::KeyEvent) -&gt; ()
+</code></pre>
+    </div>
+
+    <!-- EXERCISE 05 -->
+    <div class="exercise-card">
+        <div class="exercise-header">
+            <div class="exercise-title">Exercise 05: High-DPI Adaptation</div>
+            <div>Step 5: Physical vs. Logical Screens</div>
+        </div>
+        
+        <div class="turn-in-info">
+            <strong>Turn-in directory:</strong> <code>ex05/</code><br>
+            <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>
+        </div>
+
+        <h3>Goal</h3>
+        <p>
+            On high-density displays (like macOS Retina screens or modern 4K monitors), physical display resolutions are much higher than logical layout coordinates. If you draw pixel coordinates strictly 1:1, your UI elements will look incredibly tiny on modern screens.
+        </p>
+        <p>
+            Adapt your engine to query the monitor's scale factor (e.g. $s = 2.0$) and multiply your shape layout coordinates and sizes by this scale factor to keep things looking sharp and correctly sized.
+        </p>
+
+        <h3>Step-by-Step Instructions</h3>
+        <ul class="substeps">
+            <li><strong>Step 5.1:</strong> Store a <code>scale_factor: f64</code> in your state, defaulting to <code>1.0</code>.</li>
+            <li><strong>Step 5.2:</strong> When the window is first resumed, grab its scale factor using <code>window.scale_factor()</code>.</li>
+            <li><strong>Step 5.3:</strong> Listen for <code>WindowEvent::ScaleFactorChanged</code> inside <code>window_event</code> to catch any updates if the window is dragged to a different monitor.</li>
+            <li><strong>Step 5.4:</strong> Adjust your drawing math: calculate your layout coordinate sizes by multiplying your logical dimensions by your scale factor. For example:
+            $$\text{scaled\_x} = \text{floor}(X \times s)$$
+            $$\text{scaled\_y} = \text{floor}(Y \times s)$$
+            </li>
+        </ul>
+
+        <h3>Syntactic Architecture &amp; Signatures</h3>
+        <pre><code class="language-rust">struct ResponsiveEngine {
+    // Window buffers ...
+    scale_factor: f64,
+}
+
+// Signature hint for scale factor tracking:
+// fn handle_scale_change(&amp;mut self, scale: f64) -&gt; ()
+</code></pre>
+    </div>
+</div>
 
 </body>
 </html>

@@ -1,8 +1,7 @@
-mod ex_data;
-use ex_data::ex12;
-use ex_data::ex11;
+mod ge02;
+use ge02::ex1;
 
 
 fn main() {
-    ex12::main12();
+    ex1::main1();
 }
