@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Cross-Platform Windowing in Rust</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans leading-relaxed">
+
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-gray-950 py-12">
+        <div class="max-w-4xl mx-auto px-6">
+            <span class="text-indigo-400 font-mono text-sm uppercase tracking-wider">Systems Programming Course</span>
+            <h1 class="text-4xl font-extrabold text-white mt-2 mb-4">Universal Cross-Platform Windowing in Rust</h1>
+            <p class="text-gray-400 text-lg">Mastering OS-agnostic GUI architecture, event loop lifecycles, and windowing traps without platform-specific code.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <!-- Introduction -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Introduction</h2>
+            <p class="text-gray-300 mb-4">
+                Developing desktop software in Rust requires bridging the gap between Rust’s strict memory model and the wildly different windowing backends of target operating systems:
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+                <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                    <span class="text-blue-400 font-bold block mb-1">Windows (Win32)</span>
+                    <span class="text-sm text-gray-400">Highly stateful, thread-affine APIs utilizing Windows Messages.</span>
+                </div>
+                <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                    <span class="text-purple-400 font-bold block mb-1">macOS (Cocoa)</span>
+                    <span class="text-sm text-gray-400">Strictly main-thread bound runtime backed by Objective-C messaging.</span>
+                </div>
+                <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                    <span class="text-pink-400 font-bold block mb-1">Linux (Wayland/X11)</span>
+                    <span class="text-sm text-gray-400">Asynchronous, socket-based protocols demanding explicit frame presentation.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 1 -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Module 1: The Anatomy of a Universal Event Loop</h2>
+            <p class="text-gray-300 mb-4">
+                In modern Rust (using window managers like <code class="bg-gray-850 px-1.5 py-0.5 rounded text-indigo-300 font-mono text-sm">winit</code>), you cannot write a sequential, top-down sequential sequence in your <code class="bg-gray-850 px-1.5 py-0.5 rounded text-indigo-300 font-mono text-sm">main</code> function to spin up a window. To run safely across all hardware platforms, your application must surrender control to an event-driven lifecycle handler.
+            </p>
+            <div class="bg-indigo-950/30 border-l-4 border-indigo-500 p-4 my-4 rounded-r">
+                <strong class="text-indigo-300 block mb-1">The macOS Main-Thread Constraint:</strong>
+                <p class="text-sm text-gray-300">Apple's Cocoa API requires that window initialization and event processing run exclusively on the very first thread spawned by the operating system (the Main Thread). Initiating windows inside a secondary thread or standard static scope will trigger an instant kernel panic.</p>
+            </div>
+            <h3 class="text-lg font-bold text-white mt-6 mb-2">Key Universal Lifecycle Rules:</h3>
+            <ul class="list-disc list-inside space-y-2 text-gray-300 ml-4">
+                <li><strong class="text-white">Never create a Window inside main:</strong> Only initialize your window surface inside the <code class="font-mono text-sm text-indigo-300">resumed()</code> event handler of your state controller.</li>
+                <li><strong class="text-white">Respect Control Flow:</strong> Utilize <code class="font-mono text-sm text-indigo-300">ControlFlow::Poll</code> for real-time applications like game engines, and <code class="font-mono text-sm text-indigo-300">ControlFlow::Wait</code> for standard UI apps to conserve CPU and battery power.</li>
+            </ul>
+        </section>
+
+        <!-- Module 2 -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Module 2: Cross-Platform Rendering Backends</h2>
+            <p class="text-gray-300 mb-4">
+                Creating an OS window is only half the battle; writing pixels onto the window surface safely without writing raw DirectX, Metal, or Vulkan APIs is where a targeted rendering backend comes in.
+            </p>
+            <div class="overflow-x-auto my-6">
+                <table class="w-full text-left border-collapse text-sm text-gray-300">
+                    <thead>
+                        <tr class="border-b border-gray-700 bg-gray-800/50">
+                            <th class="p-3 font-bold text-white">Rendering Strategy</th>
+                            <th class="p-3 font-bold text-white">Common Rust Tool</th>
+                            <th class="p-3 font-bold text-white">Primary Use Case</th>
+                            <th class="p-3 font-bold text-white">Portability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-gray-800">
+                            <td class="p-3 font-mono text-indigo-300">Software Framebuffer</td>
+                            <td class="p-3">softbuffer</td>
+                            <td class="p-3">2D rendering, retro engines, simple UI</td>
+                            <td class="p-3 text-emerald-400">100% (No GPU Required)</td>
+                        </tr>
+                        <tr class="border-b border-gray-800">
+                            <td class="p-3 font-mono text-indigo-300">Immediate Mode GPU</td>
+                            <td class="p-3">egui / wgpu</td>
+                            <td class="p-3">Debug panels, developer tools, dashboards</td>
+                            <td class="p-3 text-yellow-400">High (Requires GPU Drivers)</td>
+                        </tr>
+                        <tr class="border-b border-gray-800">
+                            <td class="p-3 font-mono text-indigo-300">Declarative Graphics</td>
+                            <td class="p-3">iced / gpui</td>
+                            <td class="p-3">Complex modern desktop applications</td>
+                            <td class="p-3 text-yellow-400">High (Requires layout engine)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-amber-950/30 border-l-4 border-amber-500 p-4 my-4 rounded-r">
+                <strong class="text-amber-300 block mb-1">The "No Content" Wayland Trap:</strong>
+                <p class="text-sm text-gray-300">Wayland handles OS rendering through a strict "no content, no window" protocol. Unlike Windows, which paints a default blank window, Wayland will refuse to show your application window at all until your software submits a populated frame buffer to the OS Compositor.</p>
+            </div>
+        </section>
+
+        <!-- Module 3 -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Module 3: Native Desktop Traps & Quirks</h2>
+            <p class="text-gray-300 mb-4">
+                To achieve seamless, professional behavior across standard user environments, you must handle these structural platform constraints:
+            </p>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-bold text-indigo-400 mb-1">1. High-DPI Display Scaling (Retina / 4K)</h3>
+                    <p class="text-gray-300 text-sm">
+                        Fixed pixel dimension settings can cause windows to render tiny on 4K monitors or blurry on Retina screens. Always monitor and adjust your layouts using the <code class="font-mono text-sm text-indigo-300">WindowEvent::ScaleFactorChanged</code> hook to scale logical coordinates to physical pixels.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-indigo-400 mb-1">2. Eliminating the Windows Console Shadow</h3>
+                    <p class="text-gray-300 text-sm">
+                        Windows defaults to spawning a companion console background terminal next to compiled window binaries. Hide this behavior in release modes without stripping stdout on other platforms by setting your entrypoint module attributes properly:
+                    </p>
+                    <pre class="bg-gray-950 p-3 rounded text-sm font-mono text-emerald-400 border border-gray-800 mt-2">
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]</pre>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-indigo-400 mb-1">3. Render Coalescing</h3>
+                    <p class="text-gray-300 text-sm">
+                        Do not push draw executions immediately inside generic mouse or key input event scopes. This can overload window managers, causing stuttering. Instead, flag states as dirty and allow the OS to coordinate the timing via <code class="font-mono text-sm text-indigo-300">window.request_redraw()</code>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module 4 -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Module 4: Your Turn to Build</h2>
+            <p class="text-gray-300 mb-4">
+                Use the architectural steps below to build your first completely resilient, cross-platform window:
+            </p>
+            <ol class="list-decimal list-inside space-y-3 text-gray-300 ml-4">
+                <li><strong class="text-white">Setup:</strong> Import <code class="font-mono text-indigo-300 text-sm">winit</code> and implement the <code class="font-mono text-indigo-300 text-sm">ApplicationHandler</code>.</li>
+                <li><strong class="text-white">Sanitize Instantiation:</strong> Set up your window configuration inside the <code class="font-mono text-indigo-300 text-sm">resumed()</code> callback.</li>
+                <li><strong class="text-white">Manage Shutdown:</strong> Listen explicitly for <code class="font-mono text-indigo-300 text-sm">WindowEvent::CloseRequested</code> and exit the running event loop gracefully.</li>
+                <li><strong class="text-white">Color Flush:</strong> Use a simple software framebuffer context to flush a clean, solid background color on start. This ensures compliance with macOS, Windows, and Wayland compositions simultaneously.</li>
+            </ol>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 py-8 text-center bg-gray-950 text-gray-500 text-sm">
+        <p>&copy; 2026 Systems Engineering Course. Built for high-performance Rust workflows.</p>
+    </footer>
+
+</body>
+</html>

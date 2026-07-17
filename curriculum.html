@@ -468,7 +468,7 @@ fn main() {
             <li>Define a <code>Scene</code> trait containing three operational lifecycle state hooks:
                 <pre><code class="language-rust">pub trait Scene {
     fn on_scene_enter(&amp;mut self);
-    fn on_scene_tick(&amp;mut self) -&gt; Option&lt;SceneTransition&gt solos;
+    fn on_scene_tick(&amp;mut self) -&gt; Option&lt;SceneTransition&gt;
     fn on_scene_exit(&amp;mut self);
 }</code></pre>
             </li>
