@@ -1,1 +1,0 @@
-/home/crouyrr/Documents/perso/RustTraining/current_ex/target/debug/current_ex: /home/crouyrr/Documents/perso/RustTraining/current_ex/src/ge02/ex1.rs /home/crouyrr/Documents/perso/RustTraining/current_ex/src/ge02.rs /home/crouyrr/Documents/perso/RustTraining/current_ex/src/main.rs
