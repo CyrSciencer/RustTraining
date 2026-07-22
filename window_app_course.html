@@ -3,208 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rust Advanced Tracks - Module GE02-B: Beginner Desktop Foundations</title>
+    <title>Rust Advanced Tracks - Module GE02-B: Modern Desktop & Vector Foundations</title>
     <style>
         :root {
-            --bg-color: #ffffff;
-            --text-color: #2c3e50;
-            --primary-color: #1abc9c;
-            --secondary-color: #2c3e50;
-            --code-bg: #f8f9fa;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --primary-color: #0f766e;
+            --primary-light: #0d9488;
+            --secondary-color: #0f172a;
+            --accent-color: #f59e0b;
+            --code-bg: #0f172a;
+            --code-text: #e2e8f0;
+            --card-bg: #ffffff;
             --border-color: #e2e8f0;
-            --accent-color: #e67e22;
+            --subtle-bg: #f1f5f9;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.6;
+            line-height: 1.65;
             color: var(--text-color);
             background-color: var(--bg-color);
             margin: 0;
             padding: 0;
         }
 
+        .header-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--primary-color);
+        }
+
+        .header-banner h1 {
+            font-size: 2.2rem;
+            margin: 0 0 10px 0;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .header-banner .subtitle {
+            font-size: 1.2rem;
+            color: #2dd4bf;
+            font-weight: 500;
+            margin: 0;
+        }
+
         .container {
             max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        header {
-            border-bottom: 3px solid var(--primary-color);
-            padding-bottom: 20px;
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.3rem;
-            color: var(--secondary-color);
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-top: 0;
+            margin: -20px auto 40px auto;
+            padding: 0 20px;
         }
 
         .meta-box {
-            background-color: var(--code-bg);
-            border-left: 4px solid var(--primary-color);
-            padding: 15px;
-            margin-bottom: 30px;
-            font-size: 0.95rem;
+            background-color: var(--card-bg);
+            border-left: 5px solid var(--primary-color);
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 35px;
         }
 
-        .meta-box ul {
-            margin: 0;
-            padding-left: 20px;
+        .meta-box h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .meta-box p {
+            margin-bottom: 12px;
+            font-size: 0.98rem;
+        }
+
+        .meta-box p:last-child {
+            margin-bottom: 0;
         }
 
         h2 {
-            font-size: 1.8rem;
+            font-size: 1.75rem;
             color: var(--secondary-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
-            margin-top: 40px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-top: 45px;
+            margin-bottom: 20px;
         }
 
         h3 {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: var(--primary-color);
-            margin-top: 30px;
+            margin-top: 25px;
+            margin-bottom: 12px;
         }
 
-        p {
-            margin-bottom: 1.5rem;
-            text-align: justify;
+        p, li {
+            font-size: 1rem;
+            color: #334155;
+        }
+
+        .diagram-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 25px 0;
+            font-family: monospace;
+            font-size: 0.92rem;
+            color: #0f172a;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
         }
 
         code {
             font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-            background-color: var(--code-bg);
-            padding: 2px 6px;
+            background-color: #e2e8f0;
+            color: #0f172a;
+            padding: 3px 6px;
             border-radius: 4px;
-            font-size: 0.9em;
-            border: 1px solid var(--border-color);
+            font-size: 0.88em;
         }
 
         pre {
             font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
             background-color: var(--code-bg);
-            padding: 18px;
-            border-radius: 6px;
-            font-size: 0.9em;
+            color: var(--code-text);
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 0.88rem;
             overflow-x: auto;
-            border: 1px solid var(--border-color);
-            line-height: 1.45;
-            margin-bottom: 1.5rem;
+            line-height: 1.5;
+            margin: 18px 0 24px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+            border-radius: 0;
+            font-size: inherit;
         }
 
         .exercise-card {
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 25px;
+            border-radius: 10px;
+            padding: 30px;
             margin-bottom: 40px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            background-color: var(--card-bg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
 
         .exercise-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
+            border-bottom: 2px solid var(--subtle-bg);
+            padding-bottom: 15px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .exercise-title {
-            font-size: 1.4rem;
-            font-weight: bold;
+            font-size: 1.35rem;
+            font-weight: 700;
             color: var(--secondary-color);
             margin: 0;
         }
 
+        .step-badge {
+            background-color: #ccfbf1;
+            color: #0f766e;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
         .turn-in-info {
-            background-color: #edf2f7;
-            padding: 12px 18px;
+            background-color: var(--subtle-bg);
+            border: 1px solid var(--border-color);
+            padding: 14px 18px;
             border-radius: 6px;
             font-family: monospace;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             margin-bottom: 20px;
+            color: #334155;
+        }
+
+        .substeps {
+            background-color: #fafafa;
+            border-left: 3px solid var(--primary-light);
+            padding: 15px 15px 15px 30px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .substeps li {
+            margin-bottom: 12px;
+        }
+
+        .substeps li:last-child {
+            margin-bottom: 0;
+        }
+
+        .bridge-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid #bbf7d0;
+            border-left: 5px solid #16a34a;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+
+        .bridge-box h3 {
+            color: #15803d;
+            margin-top: 0;
         }
 
         .warning-box {
-            background-color: #fff9db;
-            border-left: 4px solid var(--accent-color);
-            color: #b05c04;
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            color: #b45309;
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 0 4px 4px 0;
             font-size: 0.95rem;
         }
-
-        .substeps {
-            background-color: #fcfcfc;
-            border-left: 3px solid #cbd5e0;
-            padding-left: 15px;
-            margin: 20px 0;
-        }
-
-        .substeps li {
-            margin-bottom: 10px;
-        }
-
-        @media print {
-            body { font-size: 12pt; color: #000a; background-color: #fff; }
-            .container { max-width: 100%; padding: 0; }
-            .exercise-card { page-break-inside: avoid; border: 1px solid #000; box-shadow: none; }
-            pre { border: 1px solid #000; page-break-inside: avoid; }
-        }
     </style>
 </head>
 <body>
 
+<div class="header-banner">
+    <h1>Rust Piscine &amp; Advanced Tracks</h1>
+    <div class="subtitle">Module GE02-B (Practical): Modern Vector Engines &amp; Desktop GUI</div>
+</div>
+
 <div class="container">
-    <header>
-        <h1>Rust Piscine &amp; Advanced Tracks</h1>
-        <div class="subtitle">Module GE02-B: Beginner Desktop Foundations &amp; Pixel Playgrounds</div>
-    </header>
 
     <div class="meta-box">
-        <strong>Curriculum Readjustment Note:</strong>
+        <h3>Curriculum Practice Note</h3>
         <p>
-            Welcome! If you have never built a desktop application, the leap from terminal utilities to windowing contexts can feel incredibly steep. This module has been rewritten from scratch. We have broken the process down into five tiny, bite-sized, logical stepping stones. 
+            Welcome to the practical desktop foundations track! In modern Rust desktop applications, developers rarely manipulate direct software framebuffers (1D byte arrays). Instead, industry standards focus on resolution-independent vector paths, modern event loops, and hardware-accelerated vector rasterization.
         </p>
         <p>
-            You will go from a simple blank window to a fully interactive, scaling desktop application without any massive jumps in difficulty.
+            This module provides the architectural specifications, types, and traits needed to build a modern desktop engine that seamlessly transitions into <strong>Project 02 (Continuous SVG Spaces)</strong> and PDF vector export pipelines.
         </p>
     </div>
 
-    <h2>Theoretical Foundation: The Event Loop &amp; Framebuffers</h2>
-    <p>
-        Unlike terminal tools that execute lines of code and exit, desktop applications use an <strong>Inversion of Control (IoC)</strong> layout. The Operating System (OS) runs an active <strong>Event Loop</strong>. Your code registers itself as a listener, sitting patiently inside this loop waiting for OS notifications like window resizes, keystrokes, or display requests.
-    </p>
-    <p>
-        To render images, we manage a <strong>Framebuffer</strong>: a giant, flat, one-dimensional array containing your pixel colors. To position a point on a standard two-dimensional grid, we calculate its index inside this linear array using:
-    </p>
-    <div style="text-align: center; margin: 15px 0;">
-        $$I = (Y \times W) + X$$
+    <div class="warning-box">
+        <strong>Zero-Panic Norm:</strong> Using <code>.unwrap()</code> or <code>.expect()</code> is strictly prohibited. Programs must handle all errors gracefully using pattern matching, <code>Result</code>, and <code>Option</code> types.
     </div>
+
+    <h2>Theoretical Foundation: GPU Vector Rendering &amp; Scaling</h2>
     <p>
-        Where $I$ is the index in your array, $W$ is the width of your window in pixels, and $X$ and $Y$ are your coordinate offsets.
+        Modern desktop applications decouple application state from visual rendering through an event-driven loop paired with resolution-independent vector paths. Instead of mapping pixel offsets manually into linear memory arrays, vector paths (such as MoveTo, LineTo, and Curves) are transformed by affine matrices and rendered dynamically at the monitor's physical scale.
     </p>
+
+    <div class="diagram-box">
+        [ Vector Geometry (SVG / Path) ] ──► [ Affine Matrix / Transform Pipeline ]<br>
+                                                       │<br>
+                                                       ▼<br>
+        [ OS Window Context (winit) ] ◄── [ Target Surface / Raster Engine ]
+    </div>
 
     <!-- EXERCISE 01 -->
     <div class="exercise-card">
         <div class="exercise-header">
-            <div class="exercise-title">Exercise 01: The Hello World Window</div>
-            <div>Step 1: Loop Control</div>
+            <h3 class="exercise-title">Exercise 01: The Modern Window Shell</h3>
+            <span class="step-badge">Step 1: Event Loop Control</span>
         </div>
         
         <div class="turn-in-info">
@@ -215,181 +282,207 @@
 
         <h3>Goal</h3>
         <p>
-            Open an empty desktop window named "My First Window" and exit cleanly when clicking the standard window close ("X") button.
+            Initialize a binary crate and implement an event loop application shell using <code>winit</code>. The window must open cleanly with the title <code>"Modern Vector Engine Shell"</code> and exit safely upon receiving close requests.
         </p>
 
         <h3>Step-by-Step Instructions</h3>
         <ul class="substeps">
-            <li><strong>Step 1.1:</strong> Initialize a binary cargo crate: <code>cargo init ex01</code>.</li>
-            <li><strong>Step 1.2:</strong> Set your dependency crate: add <code>winit = "0.29"</code> to your <code>Cargo.toml</code>.</li>
-            <li><strong>Step 1.3:</strong> Create a state struct (e.g., <code>AppShell</code>) designed to hold your window instance. Because the window cannot exist until the event loop is running, store it inside an <code>Option</code> wrapper.</li>
-            <li><strong>Step 1.4:</strong> Implement <code>winit::application::ApplicationHandler</code> for your struct. In <code>resumed</code>, check if your window is empty. If so, build it using <code>event_loop.create_window</code>.</li>
-            <li><strong>Step 1.5:</strong> In <code>window_event</code>, look for <code>WindowEvent::CloseRequested</code>. When detected, use <code>event_loop.exit()</code> to shut down.</li>
+            <li><strong>Step 1.1:</strong> Initialize a binary cargo crate in <code>ex01/</code>.</li>
+            <li><strong>Step 1.2:</strong> Declare <code>winit = "0.30"</code> in your dependencies.</li>
+            <li><strong>Step 1.3:</strong> Define an application state struct to manage the window lifetime wrapped inside an <code>Option</code>.</li>
+            <li><strong>Step 1.4:</strong> Implement the <code>winit::application::ApplicationHandler</code> trait for your struct.</li>
+            <li><strong>Step 1.5:</strong> Handle <code>WindowEvent::CloseRequested</code> to shut down the event loop safely.</li>
         </ul>
 
-        <h3>Syntactic Architecture &amp; Signatures</h3>
-        <pre><code class="language-rust">// State definition
+        <h3>Required Architecture &amp; Signatures</h3>
+        <pre><code>use winit::application::ApplicationHandler;
+use winit::event::WindowEvent;
+use winit::event_loop::{ActiveEventLoop, EventLoop};
+use winit::window::{Window, WindowId};
+
+// State container declaration
 struct AppShell {
-    window: Option&lt;winit::window::Window&gt;,
+    window: Option&lt;Window&gt;,
 }
 
-// Minimum event loop callbacks you must implement:
-// fn resumed(&amp;mut self, event_loop: &amp;winit::event_loop::ActiveEventLoop) -&gt; ()
-// fn window_event(&amp;mut self, event_loop: &amp;winit::event_loop::ActiveEventLoop, id: winit::window::WindowId, event: winit::event::WindowEvent) -&gt; ()
-</code></pre>
+// Required trait implementations:
+// impl ApplicationHandler for AppShell {
+//     fn resumed(&amp;mut self, event_loop: &amp;ActiveEventLoop);
+//     fn window_event(&amp;mut self, event_loop: &amp;ActiveEventLoop, id: WindowId, event: WindowEvent);
+// }</code></pre>
     </div>
 
     <!-- EXERCISE 02 -->
     <div class="exercise-card">
         <div class="exercise-header">
-            <div class="exercise-title">Exercise 02: Painting the canvas</div>
-            <div>Step 2: Presenting Colors</div>
+            <h3 class="exercise-title">Exercise 02: Hardware-Accelerated Vector Canvas</h3>
+            <span class="step-badge">Step 2: Vector Path Drawing</span>
         </div>
         
         <div class="turn-in-info">
             <strong>Turn-in directory:</strong> <code>ex02/</code><br>
             <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
-            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code> (v0.4.x)
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>, <code>tiny-skia</code>
         </div>
 
         <h3>Goal</h3>
         <p>
-            Take your window from Exercise 01 and paint its entire surface with a single solid background color: <strong>Deep Salmon Pink</strong> (Hex: <code>0x00FF8C94</code>).
+            Instead of raw software byte pushing, utilize <code>tiny-skia</code> vector path builders to draw resolution-independent geometry onto an offscreen canvas surface. Fill the background with **Deep Salmon Pink** (<code>#FF8C94</code>) and paint a vector shape in **Gold** (<code>#FFD700</code>).
         </p>
 
         <h3>Step-by-Step Instructions</h3>
         <ul class="substeps">
-            <li><strong>Step 2.1:</strong> Include <code>softbuffer = "0.4"</code> in your <code>Cargo.toml</code>.</li>
-            <li><strong>Step 2.2:</strong> Because `softbuffer` holds references to your window, you must prevent ownership issues. Instead of a direct <code>Window</code> value, wrap your window in a Reference Counter: <code>Option&lt;Rc&lt;Window&gt;&gt;</code>.</li>
-            <li><strong>Step 2.3:</strong> Declare your <code>softbuffer::Context</code> and <code>softbuffer::Surface</code> objects inside your state structure.</li>
-            <li><strong>Step 2.4:</strong> Inside your event loop, capture <code>WindowEvent::RedrawRequested</code> events. When triggered, obtain your surface's frame buffer, scale its size dynamically to match the current window bounds, clear it with the hex color, and call <code>present()</code>.</li>
+            <li><strong>Step 2.1:</strong> Add <code>tiny-skia = "0.11"</code> and <code>softbuffer = "0.4"</code> to <code>Cargo.toml</code>.</li>
+            <li><strong>Step 2.2:</strong> Maintain a <code>tiny-skia::Pixmap</code> buffer matching the window dimensions.</li>
+            <li><strong>Step 2.3:</strong> Write a helper function that takes a mutable reference to a <code>Pixmap</code> and appends geometry via <code>PathBuilder</code>.</li>
+            <li><strong>Step 2.4:</strong> Present the vector render target to the window surface when handling <code>WindowEvent::RedrawRequested</code>.</li>
         </ul>
 
-        <h3>Syntactic Architecture &amp; Signatures</h3>
-        <pre><code class="language-rust">use std::rc::Rc;
+        <h3>Required Architecture &amp; Signatures</h3>
+        <pre><code>use tiny_skia::{Pixmap, PathBuilder, Paint, Transform};
 
-struct PaletteApp {
-    window: Option&lt;Rc&lt;winit::window::Window&gt;&gt;,
-    context: Option&lt;softbuffer::Context&lt;Rc&lt;winit::window::Window&gt;&gt;&gt;,
-    surface: Option&lt;softbuffer::Surface&lt;Rc&lt;winit::window::Window&gt;, Rc&lt;winit::window::Window&gt;&gt;&gt;,
-}
-
-// Signature hint for painting loop:
-// fn repaint_screen(&amp;mut self) -&gt; Result&lt;(), softbuffer::SoftBufferError&gt;
-</code></pre>
+// Implement vector canvas drawing logic matching this signature:
+pub fn render_vector_canvas(pixmap: &amp;mut Pixmap) -&gt; Result&lt;(), &amp;'static str&gt; {
+    // TODO: Clear background with Deep Salmon Pink (#FF8C94)
+    // TODO: Construct path geometry using PathBuilder (Gold color #FFD700)
+    // TODO: Fill path into pixmap safely
+}</code></pre>
     </div>
 
     <!-- EXERCISE 03 -->
     <div class="exercise-card">
         <div class="exercise-header">
-            <div class="exercise-title">Exercise 03: Drawing a Simple Square</div>
-            <div>Step 3: 1D to 2D Math Coordinate Mapping</div>
+            <h3 class="exercise-title">Exercise 03: SVG Asset Ingestion &amp; Pipeline</h3>
+            <span class="step-badge">Step 3: Vector Tree Parsing</span>
         </div>
         
         <div class="turn-in-info">
             <strong>Turn-in directory:</strong> <code>ex03/</code><br>
-            <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
-            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>
+            <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code>, <code>assets/icon.svg</code><br>
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>, <code>usvg</code>, <code>resvg</code>
         </div>
 
         <h3>Goal</h3>
         <p>
-            Instead of coloring the whole window, keep the background black (<code>0x00000000</code>) and paint a single, solid **Gold Square** (size $100 \times 100$ pixels, Hex: <code>0x00FFD700</code>) in the top-left quadrant of your window at coordinates $X=50$, $Y=50$.
+            Parse an external SVG vector asset into an abstract vector tree structure via <code>usvg</code>, and render it to the window canvas using <code>resvg</code>. This establishes the visual pipeline for Project 02.
         </p>
 
         <h3>Step-by-Step Instructions</h3>
         <ul class="substeps">
-            <li><strong>Step 3.1:</strong> Carry over your frame presentation setup from Exercise 02.</li>
-            <li><strong>Step 3.2:</strong> Write a safe helper function that draws a rectangle. It should take your raw mutable 1D buffer slice, the actual width of the window, and draw to the calculated offsets.</li>
-            <li><strong>Step 3.3:</strong> Protect your loop from running out of bounds! Ensure you use nested <code>for</code> loops for $Y$ and $X$ ranges, making sure you don't write coordinates outside of your window width and height.</li>
+            <li><strong>Step 3.1:</strong> Add <code>usvg = "0.43"</code> and <code>resvg = "0.43"</code> to your workspace dependencies.</li>
+            <li><strong>Step 3.2:</strong> Parse an SVG string or file using <code>usvg::Tree::from_str</code>.</li>
+            <li><strong>Step 3.3:</strong> Return an explicit <code>Result&lt;(), &amp;str&gt;</code> error envelope if parsing or rendering fails.</li>
+            <li><strong>Step 3.4:</strong> Execute <code>resvg::render</code> to draw the SVG tree onto your target surface.</li>
         </ul>
 
-        <h3>Syntactic Architecture &amp; Signatures</h3>
-        <pre><code class="language-rust">// Signature hint for rendering 2D rectangles in a flat 1D array:
-// fn draw_rect(buffer: &amp;mut [u32], fb_width: u32, fb_height: u32, x: u32, y: u32, rect_w: u32, rect_h: u32, color: u32) -&gt; ()
-</code></pre>
+        <h3>Required Architecture &amp; Signatures</h3>
+        <pre><code>use usvg::{Tree, Options};
+use tiny_skia::PixmapMut;
+
+// Implement SVG tree rendering pipeline matching this signature:
+pub fn render_svg_to_canvas(
+    svg_content: &amp;str, 
+    target: &amp;mut PixmapMut
+) -&gt; Result&lt;(), &amp;'static str&gt; {
+    // TODO: Parse SVG content safely without panics
+    // TODO: Render parsed vector tree into pixmap target using resvg
+}</code></pre>
     </div>
 
     <!-- EXERCISE 04 -->
     <div class="exercise-card">
         <div class="exercise-header">
-            <div class="exercise-title">Exercise 04: Keyboard Controls &amp; Movement</div>
-            <div>Step 4: State Mutations &amp; Refreshes</div>
+            <h3 class="exercise-title">Exercise 04: Matrix Transformations &amp; Controls</h3>
+            <span class="step-badge">Step 4: Vector Affine Transforms</span>
         </div>
         
         <div class="turn-in-info">
             <strong>Turn-in directory:</strong> <code>ex04/</code><br>
             <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
-            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>, <code>usvg</code>, <code>resvg</code>, <code>tiny-skia</code>
         </div>
 
         <h3>Goal</h3>
         <p>
-            Make the gold square interactive! Maintain coordinates $X$ and $Y$ in your state. When the user presses the **Arrow Keys** (Up, Down, Left, Right), shift the square's position by $10$ pixels in that direction and redraw the window immediately.
+            Apply spatial updates to your vector elements dynamically! Track position $(X, Y)$ and scaling factors inside your state, updating affine matrices on keyboard events (Arrow keys / WASD).
         </p>
 
         <h3>Step-by-Step Instructions</h3>
         <ul class="substeps">
-            <li><strong>Step 4.1:</strong> Add <code>square_x: u32</code> and <code>square_y: u32</code> to your state struct.</li>
-            <li><strong>Step 4.2:</strong> In <code>window_event</code>, intercept <code>WindowEvent::KeyboardInput</code> events.</li>
-            <li><strong>Step 4.3:</strong> Match the pressed key. If it is one of the four arrow keys, modify your coordinate values. Remember to keep coordinates bounded so the square doesn't slide completely off the canvas.</li>
-            <li><strong>Step 4.4:</strong> After modifying the state, call <code>self.window.as_ref().unwrap().request_redraw()</code> to let the event loop know it needs to draw the next frame.</li>
+            <li><strong>Step 4.1:</strong> Extend your state structure with positional fields (<code>pos_x: f32</code>, <code>pos_y: f32</code>, <code>scale: f32</code>).</li>
+            <li><strong>Step 4.2:</strong> Intercept <code>WindowEvent::KeyboardInput</code> events to update coordinates.</li>
+            <li><strong>Step 4.3:</strong> Compute a 2D affine matrix using <code>tiny-skia::Transform::from_translate(...)</code> and scaling helpers.</li>
+            <li><strong>Step 4.4:</strong> Supply the computed matrix to the SVG rendering pipeline and call <code>request_redraw()</code>.</li>
         </ul>
 
-        <h3>Syntactic Architecture &amp; Signatures</h3>
-        <pre><code class="language-rust">struct InteractiveCanvas {
-    // Window buffers ...
-    square_x: u32,
-    square_y: u32,
+        <h3>Required Architecture &amp; Signatures</h3>
+        <pre><code>pub struct VectorTransformState {
+    pub pos_x: f32,
+    pub pos_y: f32,
+    pub scale: f32,
 }
 
-// Signature hint to handle keystroke matching:
-// fn handle_key_input(&amp;mut self, key_event: &amp;winit::event::KeyEvent) -&gt; ()
-</code></pre>
+impl VectorTransformState {
+    // Construct transformation matrix from state metrics:
+    pub fn build_matrix(&amp;self) -&gt; tiny_skia::Transform {
+        // TODO: Combine translation and scaling into a single Transform
+    }
+
+    // Process keyboard events safely:
+    pub fn handle_key_input(&amp;mut self, key_code: winit::keyboard::KeyCode) {
+        // TODO: Mutate coordinates based on key input
+    }
+}</code></pre>
     </div>
 
     <!-- EXERCISE 05 -->
     <div class="exercise-card">
         <div class="exercise-header">
-            <div class="exercise-title">Exercise 05: High-DPI Adaptation</div>
-            <div>Step 5: Physical vs. Logical Screens</div>
+            <h3 class="exercise-title">Exercise 05: High-DPI &amp; Crisp Vector Rescaling</h3>
+            <span class="step-badge">Step 5: Density Adaptation</span>
         </div>
         
         <div class="turn-in-info">
             <strong>Turn-in directory:</strong> <code>ex05/</code><br>
             <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
-            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>, <code>usvg</code>, <code>resvg</code>
         </div>
 
         <h3>Goal</h3>
         <p>
-            On high-density displays (like macOS Retina screens or modern 4K monitors), physical display resolutions are much higher than logical layout coordinates. If you draw pixel coordinates strictly 1:1, your UI elements will look incredibly tiny on modern screens.
-        </p>
-        <p>
-            Adapt your engine to query the monitor's scale factor (e.g. $s = 2.0$) and multiply your shape layout coordinates and sizes by this scale factor to keep things looking sharp and correctly sized.
+            Ensure vector elements remain crisp on High-DPI / Retina displays. Query scale factors, adjust canvas pixel allocation, and re-rasterize graphics dynamically to match the target display's physical density.
         </p>
 
         <h3>Step-by-Step Instructions</h3>
         <ul class="substeps">
-            <li><strong>Step 5.1:</strong> Store a <code>scale_factor: f64</code> in your state, defaulting to <code>1.0</code>.</li>
-            <li><strong>Step 5.2:</strong> When the window is first resumed, grab its scale factor using <code>window.scale_factor()</code>.</li>
-            <li><strong>Step 5.3:</strong> Listen for <code>WindowEvent::ScaleFactorChanged</code> inside <code>window_event</code> to catch any updates if the window is dragged to a different monitor.</li>
-            <li><strong>Step 5.4:</strong> Adjust your drawing math: calculate your layout coordinate sizes by multiplying your logical dimensions by your scale factor. For example:
-            $$\text{scaled\_x} = \text{floor}(X \times s)$$
-            $$\text{scaled\_y} = \text{floor}(Y \times s)$$
-            </li>
+            <li><strong>Step 5.1:</strong> Track <code>scale_factor: f64</code> in your state struct.</li>
+            <li><strong>Step 5.2:</strong> Listen for <code>WindowEvent::ScaleFactorChanged</code> to handle monitor transfers smoothly.</li>
+            <li><strong>Step 5.3:</strong> Calculate physical rendering bounds: $W_{phys} = \lfloor W_{logical} \times s \rfloor$.</li>
+            <li><strong>Step 5.4:</strong> Incorporate the display scale factor into your transformation matrix calculations before rasterization.</li>
         </ul>
 
-        <h3>Syntactic Architecture &amp; Signatures</h3>
-        <pre><code class="language-rust">struct ResponsiveEngine {
-    // Window buffers ...
-    scale_factor: f64,
-}
-
-// Signature hint for scale factor tracking:
-// fn handle_scale_change(&amp;mut self, scale: f64) -&gt; ()
-</code></pre>
+        <h3>Required Architecture &amp; Signatures</h3>
+        <pre><code>// Implement DPI calculation helper matching this signature:
+pub fn compute_density_transform(
+    base_transform: &amp;tiny_skia::Transform, 
+    scale_factor: f64
+) -&gt; tiny_skia::Transform {
+    // TODO: Multiply scaling factors to re-rasterize vectors crisply at physical resolution
+}</code></pre>
     </div>
+
+    <!-- TRANSITION BRIDGE -->
+    <div class="bridge-box">
+        <h3>Transition Bridge: From Canvas to SVG Physics &amp; PDF Engines</h3>
+        <p>
+            Completing this practical module equips you with essential architecture for the next advanced tracks:
+        </p>
+        <ul>
+            <li><strong>Project 02 (Continuous SVG Spaces):</strong> SVG geometry parsed via <code>usvg</code> serves dual purposes—providing graphics rendering sheets AND spatial collision boundaries (via <code>contains_point</code> and line segment calculations).</li>
+            <li><strong>Vector PDF Generation Pipeline:</strong> Vector commands (MoveTo, LineTo, Bezier curves) map 1:1 to PDF vector commands (via <code>printpdf</code> / <code>pdf-writer</code>), allowing resolution-independent document generation.</li>
+        </ul>
+    </div>
+
 </div>
 
 </body>
