@@ -1,10 +1,17 @@
 use winit::application::ApplicationHandler;
 use winit::window::{Window, WindowId};
 
-struct AppShell {
+pub struct AppShell {
     window_surface: Option<Window>,
 }
 
+impl AppShell {
+    pub fn new() -> Self {
+        return AppShell {
+            window_surface: None,
+        };
+    }
+}
 impl ApplicationHandler for AppShell {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         if self.window_surface.is_none() {
