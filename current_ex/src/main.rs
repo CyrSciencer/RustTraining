@@ -1,7 +1,7 @@
 mod ge02;
-use ge02::ex1;
+use ge02::ex2;
 
 
 fn main() {
-    ex1::main1();
+    ex2::main2();
 }
