@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rust Advanced Tracks - Module GE02-B: Beginner Desktop Foundations</title>
+    <title>Rust Advanced Tracks - Module GE02-B: Gentle Vector Graphics Foundations</title>
     <style>
         :root {
             --bg-color: #ffffff;
             --text-color: #2c3e50;
-            --primary-color: #1abc9c;
+            --primary-color: #0984e3;
             --secondary-color: #2c3e50;
             --code-bg: #f8f9fa;
             --border-color: #e2e8f0;
-            --accent-color: #e67e22;
+            --accent-color: #6c5ce7;
         }
 
         body {
@@ -139,16 +139,6 @@
             margin-bottom: 20px;
         }
 
-        .warning-box {
-            background-color: #fff9db;
-            border-left: 4px solid var(--accent-color);
-            color: #b05c04;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 0 4px 4px 0;
-            font-size: 0.95rem;
-        }
-
         .substeps {
             background-color: #fcfcfc;
             border-left: 3px solid #cbd5e0;
@@ -157,11 +147,11 @@
         }
 
         .substeps li {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         @media print {
-            body { font-size: 12pt; color: #000a; background-color: #fff; }
+            body { font-size: 12pt; color: #000; background-color: #fff; }
             .container { max-width: 100%; padding: 0; }
             .exercise-card { page-break-inside: avoid; border: 1px solid #000; box-shadow: none; }
             pre { border: 1px solid #000; page-break-inside: avoid; }
@@ -173,38 +163,42 @@
 <div class="container">
     <header>
         <h1>Rust Piscine &amp; Advanced Tracks</h1>
-        <div class="subtitle">Module GE02-B: Beginner Desktop Foundations &amp; Pixel Playgrounds</div>
+        <div class="subtitle">Module GE02-B: Gentle Intro to Vector Windowing</div>
     </header>
 
     <div class="meta-box">
-        <strong>Curriculum Readjustment Note:</strong>
+        <strong>Pacing &amp; Curriculum Note:</strong>
         <p>
-            Welcome! If you have never built a desktop application, the leap from terminal utilities to windowing contexts can feel incredibly steep. This module has been rewritten from scratch. We have broken the process down into five tiny, bite-sized, logical stepping stones. 
+            Transitioning to desktop application design can feel overwhelming if we try to learn window event loops, GPU rendering pipelines, vector math, and DPI scaling all at once.
         </p>
         <p>
-            You will go from a simple blank window to a fully interactive, scaling desktop application without any massive jumps in difficulty.
+            This module uses a smooth step-by-step progression. Each exercise introduces <strong>only one new concept</strong>:
         </p>
+        <ul>
+            <li><strong>Exercise 01:</strong> Window Lifecycle (`winit`)</li>
+            <li><strong>Exercise 02:</strong> Modern Vector Scene Base (`vello` + background clear)</li>
+            <li><strong>Exercise 03:</strong> Drawing Basic Shapes (`kurbo` vector primitives)</li>
+            <li><strong>Exercise 04:</strong> Vector Translation &amp; Motion (Moving shapes in 2D vector space)</li>
+            <li><strong>Exercise 05:</strong> DPI &amp; Resolution Independence (Scaling viewports smoothly)</li>
+        </ul>
     </div>
 
-    <h2>Theoretical Foundation: The Event Loop &amp; Framebuffers</h2>
+    <h2>Theoretical Overview: What is a Vector Scene?</h2>
     <p>
-        Unlike terminal tools that execute lines of code and exit, desktop applications use an <strong>Inversion of Control (IoC)</strong> layout. The Operating System (OS) runs an active <strong>Event Loop</strong>. Your code registers itself as a listener, sitting patiently inside this loop waiting for OS notifications like window resizes, keystrokes, or display requests.
+        Instead of modifying individual pixels in a grid ($I = Y \times W + X$), modern user interfaces construct a <strong>Scene Graph</strong> made of shapes (rectangles, circles, curves).
     </p>
     <p>
-        To render images, we manage a <strong>Framebuffer</strong>: a giant, flat, one-dimensional array containing your pixel colors. To position a point on a standard two-dimensional grid, we calculate its index inside this linear array using:
+        When you tell a vector engine to draw a shape, you give it a mathematical description (e.g., <em>"draw a circle at center (100, 100) with radius 50"</em>). The engine then draws this shape smoothly onto the display at whatever resolution the screen supports.
     </p>
-    <div style="text-align: center; margin: 15px 0;">
-        $$I = (Y \times W) + X$$
-    </div>
     <p>
-        Where $I$ is the index in your array, $W$ is the width of your window in pixels, and $X$ and $Y$ are your coordinate offsets.
+        Concretely, in this module the shapes live in a <code>vello::Scene</code> — an object you can build and rebuild freely on the CPU with no GPU involved at all. GPU work only enters the picture once, at the very last step of each frame, when you hand that <code>Scene</code> to a <code>vello::Renderer</code> to actually turn it into pixels. Exercise 02 walks through exactly what has to exist before that handoff can happen.
     </p>
 
     <!-- EXERCISE 01 -->
     <div class="exercise-card">
         <div class="exercise-header">
-            <div class="exercise-title">Exercise 01: The Hello World Window</div>
-            <div>Step 1: Loop Control</div>
+            <div class="exercise-title">Exercise 01: Creating the Application Window</div>
+            <div>Step 1: The Event Loop</div>
         </div>
         
         <div class="turn-in-info">
@@ -215,180 +209,311 @@
 
         <h3>Goal</h3>
         <p>
-            Open an empty desktop window named "My First Window" and exit cleanly when clicking the standard window close ("X") button.
+            Open a blank desktop window titled <code>"Vector Shell"</code> and handle the close button properly.
+        </p>
+
+        <h3>Why a struct and a trait, not just a function?</h3>
+        <p>
+            A desktop window isn't something you draw once and forget — the OS keeps sending it messages ("resize me," "you were just minimized," "the user clicked close") for as long as it exists, in an order you don't control. Rust's answer to "run some code every time an unpredictable event arrives" is: put your data in a <strong>struct</strong>, and implement a <strong>trait</strong> whose methods the OS calls back into. That's all <code>ApplicationHandler</code> is — a contract that says "call <code>resumed</code> once you have a window to give me, then call <code>window_event</code> every time something happens to it." You never call these methods yourself; <code>winit</code> calls them for you from inside <code>run_app</code>.
+        </p>
+        <p>
+            Two methods, two jobs: <code>resumed()</code> fires once (right at startup, and again if the OS ever tears the window down and hands it back — mainly relevant on mobile) — this is where you <em>create</em> the window. <code>window_event()</code> fires repeatedly, once per OS message — this is where you <em>react</em> to things that already happened.
         </p>
 
         <h3>Step-by-Step Instructions</h3>
         <ul class="substeps">
-            <li><strong>Step 1.1:</strong> Initialize a binary cargo crate: <code>cargo init ex01</code>.</li>
-            <li><strong>Step 1.2:</strong> Set your dependency crate: add <code>winit = "0.29"</code> to your <code>Cargo.toml</code>.</li>
-            <li><strong>Step 1.3:</strong> Create a state struct (e.g., <code>AppShell</code>) designed to hold your window instance. Because the window cannot exist until the event loop is running, store it inside an <code>Option</code> wrapper.</li>
-            <li><strong>Step 1.4:</strong> Implement <code>winit::application::ApplicationHandler</code> for your struct. In <code>resumed</code>, check if your window is empty. If so, build it using <code>event_loop.create_window</code>.</li>
-            <li><strong>Step 1.5:</strong> In <code>window_event</code>, look for <code>WindowEvent::CloseRequested</code>. When detected, use <code>event_loop.exit()</code> to shut down.</li>
+            <li><strong>Step 1.1:</strong> Run <code>cargo init ex01</code>, then add <code>winit = "0.30"</code> under <code>[dependencies]</code> in <code>Cargo.toml</code> (or run <code>cargo add winit@0.30</code> instead of hand-editing the file).</li>
+            <li><strong>Step 1.2:</strong> Define a struct named <code>AppShell</code> with one field: <code>window: Option&lt;Arc&lt;Window&gt;&gt;</code>. It starts as <code>None</code> because the moment your program starts, the OS hasn't handed you a window yet — that only happens inside <code>resumed()</code>. Add <code>#[derive(Default)]</code> above the struct so you can construct it as <code>AppShell::default()</code> without writing a constructor by hand.</li>
+            <li><strong>Step 1.3:</strong> Implement <code>ApplicationHandler</code> for <code>AppShell</code> (copy the method signatures from the skeleton below exactly — <code>winit</code> won't call your methods if a signature doesn't match the trait). Inside <code>resumed()</code>: check <code>if self.window.is_none()</code> first, since this method can run more than once and you don't want to accidentally spawn a second window; then build a <code>WindowAttributes</code> with <code>.with_title("Vector Shell")</code>, pass it to <code>event_loop.create_window(...)</code>, wrap the result in <code>Arc::new(...)</code>, and store it in <code>self.window</code>.</li>
+            <li><strong>Step 1.4:</strong> Inside <code>window_event()</code>, match on the incoming <code>event</code>. When it's <code>WindowEvent::CloseRequested</code> (fired when the user clicks the window's close button), call <code>event_loop.exit()</code> — skip this and clicking close does nothing, and you'll have to kill the process from the terminal instead.</li>
+            <li><strong>Step 1.5:</strong> In <code>main()</code>, build the loop with <code>EventLoop::new().unwrap()</code>, construct <code>AppShell::default()</code>, and hand control to <code>winit</code> with <code>event_loop.run_app(&amp;mut app).unwrap()</code>. This call blocks until <code>exit()</code> is called — from here on, everything your app does happens inside the two methods above, not in <code>main</code>.</li>
         </ul>
 
-        <h3>Syntactic Architecture &amp; Signatures</h3>
-        <pre><code class="language-rust">// State definition
+        <h3>Starter Code Skeleton</h3>
+        <pre><code class="language-rust">use std::sync::Arc;
+use winit::application::ApplicationHandler;
+use winit::event::WindowEvent;
+use winit::event_loop::{ActiveEventLoop, EventLoop};
+use winit::window::{Window, WindowId};
+
+#[derive(Default)]
 struct AppShell {
-    window: Option&lt;winit::window::Window&gt;,
+    window: Option&lt;Arc&lt;Window&gt;&gt;,
 }
 
-// Minimum event loop callbacks you must implement:
-// fn resumed(&amp;mut self, event_loop: &amp;winit::event_loop::ActiveEventLoop) -&gt; ()
-// fn window_event(&amp;mut self, event_loop: &amp;winit::event_loop::ActiveEventLoop, id: winit::window::WindowId, event: winit::event::WindowEvent) -&gt; ()
-</code></pre>
+impl ApplicationHandler for AppShell {
+    fn resumed(&amp;mut self, event_loop: &amp;ActiveEventLoop) {
+        if self.window.is_none() {
+            let attr = Window::default_attributes().with_title("Vector Shell");
+            let win = Arc::new(event_loop.create_window(attr).unwrap());
+            self.window = Some(win);
+        }
+    }
+
+    fn window_event(&amp;mut self, event_loop: &amp;ActiveEventLoop, _id: WindowId, event: WindowEvent) {
+        if let WindowEvent::CloseRequested = event {
+            event_loop.exit();
+        }
+    }
+}
+
+fn main() {
+    let event_loop = EventLoop::new().unwrap();
+    let mut app = AppShell::default();
+    event_loop.run_app(&amp;mut app).unwrap();
+}</code></pre>
     </div>
 
     <!-- EXERCISE 02 -->
     <div class="exercise-card">
         <div class="exercise-header">
-            <div class="exercise-title">Exercise 02: Painting the canvas</div>
-            <div>Step 2: Presenting Colors</div>
+            <div class="exercise-title">Exercise 02: Presenting a Vector Background Color</div>
+            <div>Step 2: The Vector Scene</div>
         </div>
         
         <div class="turn-in-info">
             <strong>Turn-in directory:</strong> <code>ex02/</code><br>
             <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
-            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code> (v0.4.x)
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>vello</code>, <code>wgpu</code>, <code>pollster</code>
         </div>
 
         <h3>Goal</h3>
         <p>
-            Take your window from Exercise 01 and paint its entire surface with a single solid background color: <strong>Deep Salmon Pink</strong> (Hex: <code>0x00FF8C94</code>).
+            Connect a vector renderer (<code>vello</code>) to your window and clear the background with a soft vector color: <strong>Deep Salmon Pink</strong> (<code>Color::from_rgb8(255, 140, 148)</code>).
+        </p>
+
+        <h3>What "initializing the vector context" actually means</h3>
+        <p>
+            This is the step most beginners get stuck on, because "connect a renderer to your window" hides four separate objects you need to create, in order, before you can draw a single pixel. Here's what each one is and why it exists:
+        </p>
+        <ul class="substeps">
+            <li><strong><code>wgpu::Instance</code></strong> — your entry point into the GPU drivers on the machine. You create exactly one of these, usually with <code>wgpu::Instance::default()</code>.</li>
+            <li><strong><code>wgpu::Surface</code></strong> — the thing wgpu draws <em>into</em> that the OS displays on screen. You get one from <code>instance.create_surface(window.clone())</code> — this is why your window needs to be wrapped in an <code>Arc</code>: the surface borrows it for as long as the surface exists.</li>
+            <li><strong><code>wgpu::Device</code> and <code>wgpu::Queue</code></strong> — your actual handle to the GPU. The <code>Device</code> creates GPU resources (textures, buffers); the <code>Queue</code> is where you submit rendering work to actually run. You get both together, asynchronously, via <code>instance.request_adapter(...)</code> then <code>adapter.request_device(...)</code>.</li>
+            <li><strong><code>vello::Renderer</code></strong> — built once you have a <code>Device</code>, this is the object that knows how to turn a <code>Scene</code> (your list of shapes) into pixels on a <code>Surface</code>.</li>
+        </ul>
+        <p>
+            One wrinkle: steps 2 and 3 above are <code>async</code> functions, but <code>resumed()</code> is not an <code>async</code> method — <code>winit</code> calls it synchronously. The fix is <code>pollster::block_on(...)</code>, which is why <code>pollster</code> is in your dependency list: it runs an <code>async</code> block to completion right there, blocking the current thread instead of yielding control.
         </p>
 
         <h3>Step-by-Step Instructions</h3>
         <ul class="substeps">
-            <li><strong>Step 2.1:</strong> Include <code>softbuffer = "0.4"</code> in your <code>Cargo.toml</code>.</li>
-            <li><strong>Step 2.2:</strong> Because `softbuffer` holds references to your window, you must prevent ownership issues. Instead of a direct <code>Window</code> value, wrap your window in a Reference Counter: <code>Option&lt;Rc&lt;Window&gt;&gt;</code>.</li>
-            <li><strong>Step 2.3:</strong> Declare your <code>softbuffer::Context</code> and <code>softbuffer::Surface</code> objects inside your state structure.</li>
-            <li><strong>Step 2.4:</strong> Inside your event loop, capture <code>WindowEvent::RedrawRequested</code> events. When triggered, obtain your surface's frame buffer, scale its size dynamically to match the current window bounds, clear it with the hex color, and call <code>present()</code>.</li>
+            <li><strong>Step 2.1:</strong> Add <code>vello = "0.5"</code>, <code>wgpu = "27.0"</code>, and <code>pollster = "0.3"</code> to <code>Cargo.toml</code> (or <code>cargo add vello wgpu pollster</code> and let Cargo pick current compatible versions).</li>
+            <li><strong>Step 2.2:</strong> Create a state struct <code>VectorCanvas</code> holding: <code>window: Option&lt;Arc&lt;Window&gt;&gt;</code>, <code>surface: Option&lt;wgpu::Surface&lt;'static&gt;&gt;</code>, <code>device: Option&lt;wgpu::Device&gt;</code>, <code>queue: Option&lt;wgpu::Queue&gt;</code>, <code>renderer: Option&lt;vello::Renderer&gt;</code>, and <code>scene: vello::Scene</code> (this last one doesn't need to be an <code>Option</code> — <code>Scene::new()</code> gives you an empty scene immediately, no GPU needed).</li>
+            <li><strong>Step 2.3:</strong> Inside <code>resumed()</code>, after creating the window as in Exercise 01: build the four objects listed above, in that exact order (each one is built from the previous one), wrapping the async calls in <code>pollster::block_on</code>. Store all five results in <code>self</code>.</li>
+            <li><strong>Step 2.4:</strong> Configure the surface once, right after creating it, with <code>surface.configure(&amp;device, &amp;surface_config)</code> — a <code>wgpu::SurfaceConfiguration</code> tells wgpu the pixel format and size to render at; without this call, <code>get_current_texture()</code> later will panic.</li>
+            <li><strong>Step 2.5:</strong> In <code>window_event()</code>, match on <code>WindowEvent::RedrawRequested</code>. Inside it: call <code>self.scene.reset()</code> (clears last frame's shapes so they don't pile up), get the next frame with <code>surface.get_current_texture()</code>, then call <code>renderer.render_to_surface(device, queue, &amp;self.scene, &amp;surface_texture, &amp;RenderParams { base_color: Color::from_rgb8(255, 140, 148), width, height, antialiasing_method: vello::AaConfig::Msaa16 })</code>, and finally <code>surface_texture.present()</code> to actually show the frame on screen.</li>
+            <li><strong>Step 2.6:</strong> Nothing triggers <code>RedrawRequested</code> on its own yet — call <code>window.request_redraw()</code> once at the end of <code>resumed()</code> so you see your salmon-pink window at all.</li>
         </ul>
 
         <h3>Syntactic Architecture &amp; Signatures</h3>
-        <pre><code class="language-rust">use std::rc::Rc;
+        <pre><code class="language-rust">use vello::{peniko::Color, AaConfig, RenderParams, Renderer, RendererOptions, Scene};
 
-struct PaletteApp {
-    window: Option&lt;Rc&lt;winit::window::Window&gt;&gt;,
-    context: Option&lt;softbuffer::Context&lt;Rc&lt;winit::window::Window&gt;&gt;&gt;,
-    surface: Option&lt;softbuffer::Surface&lt;Rc&lt;winit::window::Window&gt;, Rc&lt;winit::window::Window&gt;&gt;&gt;,
+struct VectorCanvas {
+    window: Option&lt;Arc&lt;winit::window::Window&gt;&gt;,
+    surface: Option&lt;wgpu::Surface&lt;'static&gt;&gt;,
+    surface_config: Option&lt;wgpu::SurfaceConfiguration&gt;,
+    device: Option&lt;wgpu::Device&gt;,
+    queue: Option&lt;wgpu::Queue&gt;,
+    renderer: Option&lt;Renderer&gt;,
+    scene: Scene,
 }
 
-// Signature hint for painting loop:
-// fn repaint_screen(&amp;mut self) -&gt; Result&lt;(), softbuffer::SoftBufferError&gt;
+// Inside resumed(), after self.window is set (see Exercise 01):
+let instance = wgpu::Instance::default();
+let surface = instance.create_surface(window.clone()).unwrap();
+let adapter = pollster::block_on(instance.request_adapter(
+    &amp;wgpu::RequestAdapterOptions {
+        compatible_surface: Some(&amp;surface),
+        ..Default::default()
+    },
+)).unwrap();
+let (device, queue) = pollster::block_on(
+    adapter.request_device(&amp;wgpu::DeviceDescriptor::default())
+).unwrap();
+
+let size = window.inner_size();
+let surface_config = surface
+    .get_default_config(&amp;adapter, size.width.max(1), size.height.max(1))
+    .unwrap();
+surface.configure(&amp;device, &amp;surface_config);
+
+let renderer = Renderer::new(&amp;device, RendererOptions::default()).unwrap();
+
+// In WindowEvent::RedrawRequested:
+self.scene.reset();
+let surface_texture = self.surface.as_ref().unwrap().get_current_texture().unwrap();
+self.renderer.as_mut().unwrap().render_to_surface(
+    self.device.as_ref().unwrap(),
+    self.queue.as_ref().unwrap(),
+    &amp;self.scene,
+    &amp;surface_texture,
+    &amp;RenderParams {
+        base_color: Color::from_rgb8(255, 140, 148), // Deep Salmon Pink
+        width: self.surface_config.as_ref().unwrap().width,
+        height: self.surface_config.as_ref().unwrap().height,
+        antialiasing_method: AaConfig::Msaa16,
+    },
+).unwrap();
+surface_texture.present();
 </code></pre>
     </div>
 
     <!-- EXERCISE 03 -->
     <div class="exercise-card">
         <div class="exercise-header">
-            <div class="exercise-title">Exercise 03: Drawing a Simple Square</div>
-            <div>Step 3: 1D to 2D Math Coordinate Mapping</div>
+            <div class="exercise-title">Exercise 03: Adding Your First Vector Shape</div>
+            <div>Step 3: Vector Geometry</div>
         </div>
         
         <div class="turn-in-info">
             <strong>Turn-in directory:</strong> <code>ex03/</code><br>
             <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
-            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>vello</code>, <code>kurbo</code>, <code>wgpu</code>, <code>pollster</code>
         </div>
 
         <h3>Goal</h3>
         <p>
-            Instead of coloring the whole window, keep the background black (<code>0x00000000</code>) and paint a single, solid **Gold Square** (size $100 \times 100$ pixels, Hex: <code>0x00FFD700</code>) in the top-left quadrant of your window at coordinates $X=50$, $Y=50$.
+            Draw a solid **Gold Rounded Rectangle** (100x100px, corner radius 16px) on top of your background color using 2D vector geometry primitives.
         </p>
 
         <h3>Step-by-Step Instructions</h3>
         <ul class="substeps">
-            <li><strong>Step 3.1:</strong> Carry over your frame presentation setup from Exercise 02.</li>
-            <li><strong>Step 3.2:</strong> Write a safe helper function that draws a rectangle. It should take your raw mutable 1D buffer slice, the actual width of the window, and draw to the calculated offsets.</li>
-            <li><strong>Step 3.3:</strong> Protect your loop from running out of bounds! Ensure you use nested <code>for</code> loops for $Y$ and $X$ ranges, making sure you don't write coordinates outside of your window width and height.</li>
+            <li><strong>Step 3.1:</strong> Add <code>kurbo = "0.11"</code> (the standard 2D vector geometry library — it defines shapes and math, but knows nothing about GPUs or rendering) to <code>Cargo.toml</code>.</li>
+            <li><strong>Step 3.2:</strong> Define a shape primitive using <code>kurbo::RoundedRect::new(x0, y0, x1, y1, radius)</code>. Note this takes two <em>corners</em>, not a corner plus a width/height — for a rectangle at $X=50, Y=50$ that's $100 \times 100$, the second corner is $(50+100, 50+100) = (150, 150)$, which is why the code below reads <code>RoundedRect::new(50.0, 50.0, 150.0, 150.0, 16.0)</code>.</li>
+            <li><strong>Step 3.3:</strong> Call <code>scene.fill(...)</code> to add the shape to your scene graph. It takes five arguments, in order — worth understanding each rather than treating them as boilerplate:
+                <ul>
+                    <li><code>Fill::NonZero</code> — the fill rule, which only matters for self-intersecting or nested shapes (it decides which regions count as "inside"). For a plain rectangle it's irrelevant; <code>NonZero</code> is simply the conventional default.</li>
+                    <li><code>Affine::IDENTITY</code> — a 2D transform matrix applied to the shape before drawing. <code>IDENTITY</code> means "no transform" — draw the shape exactly at the coordinates you gave it. You'll replace this with a real transform in Exercise 04 to move the shape without redefining its geometry.</li>
+                    <li><code>Color::from_rgb8(255, 215, 0)</code> — the fill color (Gold).</li>
+                    <li><code>None</code> — an optional gradient <code>Brush</code> transform; <code>None</code> means "use the solid color as-is, no gradient."</li>
+                    <li><code>&amp;rect</code> — the shape itself, borrowed since <code>scene.fill</code> only needs to read its geometry.</li>
+                </ul>
+<pre><code class="language-rust">let rect = kurbo::RoundedRect::new(50.0, 50.0, 150.0, 150.0, 16.0);
+scene.fill(
+    vello::peniko::Fill::NonZero,
+    kurbo::Affine::IDENTITY,
+    vello::peniko::Color::from_rgb8(255, 215, 0), // Gold
+    None,
+    &amp;rect,
+);</code></pre>
+            </li>
+            <li><strong>Step 3.4:</strong> Call <code>scene.fill(...)</code> before <code>renderer.render_to_surface(...)</code> in your <code>RedrawRequested</code> handler from Exercise 02 (after <code>scene.reset()</code>, since <code>reset()</code> wipes anything drawn on a previous frame). Render the frame to see your sharp, anti-aliased vector shape.</li>
         </ul>
-
-        <h3>Syntactic Architecture &amp; Signatures</h3>
-        <pre><code class="language-rust">// Signature hint for rendering 2D rectangles in a flat 1D array:
-// fn draw_rect(buffer: &amp;mut [u32], fb_width: u32, fb_height: u32, x: u32, y: u32, rect_w: u32, rect_h: u32, color: u32) -&gt; ()
-</code></pre>
     </div>
 
     <!-- EXERCISE 04 -->
     <div class="exercise-card">
         <div class="exercise-header">
-            <div class="exercise-title">Exercise 04: Keyboard Controls &amp; Movement</div>
-            <div>Step 4: State Mutations &amp; Refreshes</div>
+            <div class="exercise-title">Exercise 04: Moving Shapes with Vector Translation</div>
+            <div>Step 4: Vector Coordinates & Motion</div>
         </div>
         
         <div class="turn-in-info">
             <strong>Turn-in directory:</strong> <code>ex04/</code><br>
             <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
-            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>vello</code>, <code>kurbo</code>, <code>wgpu</code>, <code>pollster</code>
         </div>
 
         <h3>Goal</h3>
         <p>
-            Make the gold square interactive! Maintain coordinates $X$ and $Y$ in your state. When the user presses the **Arrow Keys** (Up, Down, Left, Right), shift the square's position by $10$ pixels in that direction and redraw the window immediately.
+            Make your gold rectangle interactive! Store position coordinates $(X, Y)$ in your state and move the vector shape smoothly when pressing the arrow keys.
         </p>
 
         <h3>Step-by-Step Instructions</h3>
         <ul class="substeps">
-            <li><strong>Step 4.1:</strong> Add <code>square_x: u32</code> and <code>square_y: u32</code> to your state struct.</li>
-            <li><strong>Step 4.2:</strong> In <code>window_event</code>, intercept <code>WindowEvent::KeyboardInput</code> events.</li>
-            <li><strong>Step 4.3:</strong> Match the pressed key. If it is one of the four arrow keys, modify your coordinate values. Remember to keep coordinates bounded so the square doesn't slide completely off the canvas.</li>
-            <li><strong>Step 4.4:</strong> After modifying the state, call <code>self.window.as_ref().unwrap().request_redraw()</code> to let the event loop know it needs to draw the next frame.</li>
+            <li><strong>Step 4.1:</strong> Add <code>pos_x: f64</code> and <code>pos_y: f64</code> to your application state, initialized to <code>(50.0, 50.0)</code>.</li>
+            <li><strong>Step 4.2:</strong> Catch <code>WindowEvent::KeyboardInput { event, .. }</code> inside <code>window_event()</code>. This is the fiddliest match in the exercise, since the key you actually want is nested three levels deep: the outer event holds a <code>KeyEvent</code>, which holds a <code>logical_key: Key</code>, which for a named key (arrows, Enter, Escape, etc. — as opposed to a letter or digit) is the variant <code>Key::Named(NamedKey::ArrowUp)</code> (and so on for <code>ArrowDown</code>/<code>ArrowLeft</code>/<code>ArrowRight</code>). You also usually want to check <code>event.state == ElementState::Pressed</code>, or your rectangle will move again on key release too. Putting it together:
+<pre><code class="language-rust">use winit::event::{ElementState, KeyEvent};
+use winit::keyboard::{Key, NamedKey};
+
+WindowEvent::KeyboardInput {
+    event: KeyEvent { logical_key: Key::Named(key), state: ElementState::Pressed, .. },
+    ..
+} => match key {
+    NamedKey::ArrowUp    => self.pos_y -= 10.0,
+    NamedKey::ArrowDown  => self.pos_y += 10.0,
+    NamedKey::ArrowLeft  => self.pos_x -= 10.0,
+    NamedKey::ArrowRight => self.pos_x += 10.0,
+    _ => {}
+},</code></pre>
+                (Screen Y increases downward, which is why <code>ArrowUp</code> subtracts.)</li>
+            <li><strong>Step 4.3:</strong> Instead of recreating the rectangle math, apply a translation offset using <code>kurbo::Affine::translate((self.pos_x, self.pos_y))</code> as the second argument to <code>scene.fill(...)</code>, in place of the <code>Affine::IDENTITY</code> from Exercise 03. Also change your <code>RoundedRect</code> definition to start at the origin — <code>RoundedRect::new(0.0, 0.0, 100.0, 100.0, 16.0)</code> — so the translation is the <em>only</em> thing positioning it; otherwise you'd be adding <code>pos_x</code>/<code>pos_y</code> on top of the rectangle's own (50, 50) offset from before.</li>
+            <li><strong>Step 4.4:</strong> Call <code>window.request_redraw()</code> at the end of the key-handling branch. Without it, you've updated <code>self.pos_x</code>/<code>self.pos_y</code> in memory, but <code>RedrawRequested</code> never fires again on its own, so the screen won't update until some other event happens to trigger a redraw.</li>
         </ul>
 
         <h3>Syntactic Architecture &amp; Signatures</h3>
-        <pre><code class="language-rust">struct InteractiveCanvas {
-    // Window buffers ...
-    square_x: u32,
-    square_y: u32,
-}
+        <pre><code class="language-rust">use kurbo::Affine;
 
-// Signature hint to handle keystroke matching:
-// fn handle_key_input(&amp;mut self, key_event: &amp;winit::event::KeyEvent) -&gt; ()
-</code></pre>
+// In your scene drawing logic:
+let shape = kurbo::RoundedRect::new(0.0, 0.0, 100.0, 100.0, 16.0);
+let transform = Affine::translate((self.pos_x, self.pos_y));
+
+scene.fill(Fill::NonZero, transform, Color::from_rgb8(255, 215, 0), None, &amp;shape);</code></pre>
     </div>
 
     <!-- EXERCISE 05 -->
     <div class="exercise-card">
         <div class="exercise-header">
-            <div class="exercise-title">Exercise 05: High-DPI Adaptation</div>
-            <div>Step 5: Physical vs. Logical Screens</div>
+            <div class="exercise-title">Exercise 05: Resolution Independence & Viewport Scaling</div>
+            <div>Step 5: DPI & Dynamic Resizing</div>
         </div>
         
         <div class="turn-in-info">
             <strong>Turn-in directory:</strong> <code>ex05/</code><br>
             <strong>Files to turn in:</strong> <code>Cargo.toml</code>, <code>src/main.rs</code><br>
-            <strong>Allowed external crates:</strong> <code>winit</code>, <code>softbuffer</code>
+            <strong>Allowed external crates:</strong> <code>winit</code>, <code>vello</code>, <code>kurbo</code>, <code>wgpu</code>, <code>pollster</code>
         </div>
 
         <h3>Goal</h3>
         <p>
-            On high-density displays (like macOS Retina screens or modern 4K monitors), physical display resolutions are much higher than logical layout coordinates. If you draw pixel coordinates strictly 1:1, your UI elements will look incredibly tiny on modern screens.
+            Handle window resizing and high-DPI (Retina/4K) displays so your vector shapes stay crystal clear without becoming tiny or pixelated.
+        </p>
+
+        <h3>What "scale factor" actually is, concretely</h3>
+        <p>
+            A "4K" or "Retina" monitor packs more physical pixels into the same physical inch of screen than an older monitor did. If your app draws a "100×100 pixel" rectangle by placing exactly 100 physical pixels on screen, that rectangle will be <em>physically tiny</em> on a high-density display — roughly a postage stamp instead of a comfortable button. The OS's fix is to report a <strong>scale factor</strong> alongside window events: a plain monitor reports <code>1.0</code>, a typical Retina display reports <code>2.0</code>, and you'll see values like <code>1.5</code> or <code>1.25</code> on some Windows/Linux setups. This number tells you "for every one logical pixel the user expects, actually draw this many physical pixels."
         </p>
         <p>
-            Adapt your engine to query the monitor's scale factor (e.g. $s = 2.0$) and multiply your shape layout coordinates and sizes by this scale factor to keep things looking sharp and correctly sized.
+            Two different sizes flow through <code>winit</code>, and mixing them up is the most common bug in this exercise: <strong>logical size</strong> (what your UI is conceptually laid out in — a 100×100 rectangle is still "100×100" regardless of monitor) and <strong>physical size</strong> (actual device pixels — <code>logical × scale_factor</code>). Your GPU surface must always be configured in <em>physical</em> pixels (that's what <code>WindowEvent::Resized</code> gives you), but the shapes in your <code>Scene</code> are defined in <em>logical</em> coordinates — which is exactly what the scale transform in Step 5.4 bridges.
         </p>
 
         <h3>Step-by-Step Instructions</h3>
         <ul class="substeps">
-            <li><strong>Step 5.1:</strong> Store a <code>scale_factor: f64</code> in your state, defaulting to <code>1.0</code>.</li>
-            <li><strong>Step 5.2:</strong> When the window is first resumed, grab its scale factor using <code>window.scale_factor()</code>.</li>
-            <li><strong>Step 5.3:</strong> Listen for <code>WindowEvent::ScaleFactorChanged</code> inside <code>window_event</code> to catch any updates if the window is dragged to a different monitor.</li>
-            <li><strong>Step 5.4:</strong> Adjust your drawing math: calculate your layout coordinate sizes by multiplying your logical dimensions by your scale factor. For example:
-            $$\text{scaled\_x} = \text{floor}(X \times s)$$
-            $$\text{scaled\_y} = \text{floor}(Y \times s)$$
-            </li>
+            <li><strong>Step 5.1:</strong> Store a <code>scale_factor: f64</code> in your state struct, initialized to <code>1.0</code> as a placeholder — you'll overwrite it with the real value the first time you get a chance (see Step 5.3), so <code>1.0</code> just avoids needing an <code>Option</code>.</li>
+            <li><strong>Step 5.2:</strong> Handle <code>WindowEvent::Resized(physical_size)</code>: this fires whenever the window's pixel dimensions change (the user dragged an edge, maximized it, etc.), and <code>physical_size</code> is already in physical pixels. Update <code>self.surface_config.width</code> and <code>.height</code> to the new values (guard against <code>0</code> — see the code below, since a minimized window reports size 0 and reconfiguring to zero size will panic), then call <code>surface.configure(&amp;device, &amp;surface_config)</code> again so the GPU knows the new size.</li>
+            <li><strong>Step 5.3:</strong> Handle <code>WindowEvent::ScaleFactorChanged { scale_factor, .. }</code>: this fires when the window moves to a monitor with a different pixel density (common with multi-monitor setups mixing a laptop screen and an external display), or once early on to report the initial value. Store the new <code>scale_factor</code> in <code>self.scale_factor</code> and call <code>window.request_redraw()</code>, since your shapes need to be redrawn at the new scale.</li>
+            <li><strong>Step 5.4:</strong> When filling your scene, replace the plain <code>Affine::translate(...)</code> from Exercise 04 with <code>Affine::scale(self.scale_factor) * Affine::translate((self.pos_x, self.pos_y))</code> — matrix multiplication order matters here: this scales <em>after</em> translating, so your logical coordinates ($100 \times 100$ at position <code>(pos_x, pos_y)</code>) get converted to physical pixels as the very last step, right before rendering, while everything else in your code keeps working in simple logical units.</li>
         </ul>
 
         <h3>Syntactic Architecture &amp; Signatures</h3>
-        <pre><code class="language-rust">struct ResponsiveEngine {
-    // Window buffers ...
-    scale_factor: f64,
+        <pre><code class="language-rust">impl VectorCanvas {
+    fn handle_resize(&amp;mut self, new_size: winit::dpi::PhysicalSize&lt;u32&gt;) {
+        if new_size.width &gt; 0 &amp;&amp; new_size.height &gt; 0 {
+            self.surface_config.width = new_size.width;
+            self.surface_config.height = new_size.height;
+            self.surface.as_ref().unwrap().configure(
+                self.device.as_ref().unwrap(), 
+                &amp;self.surface_config
+            );
+        }
+    }
 }
 
-// Signature hint for scale factor tracking:
-// fn handle_scale_change(&amp;mut self, scale: f64) -&gt; ()
-</code></pre>
+// In window_event():
+WindowEvent::Resized(new_size) => self.handle_resize(new_size),
+
+WindowEvent::ScaleFactorChanged { scale_factor, .. } => {
+    self.scale_factor = scale_factor;
+    if let Some(window) = &amp;self.window {
+        window.request_redraw();
+    }
+}
+
+// When filling the scene each frame:
+let transform = Affine::scale(self.scale_factor)
+    * Affine::translate((self.pos_x, self.pos_y));
+scene.fill(Fill::NonZero, transform, Color::from_rgb8(255, 215, 0), None, &amp;shape);</code></pre>
     </div>
 </div>
 
